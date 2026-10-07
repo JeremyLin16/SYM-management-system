@@ -1,0 +1,3526 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FBF6EC" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1E1B16" media="(prefers-color-scheme: dark)">
+<title>繁星团契管理系统</title>
+<link rel="icon" href="icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="繁星团契管理系统">
+<meta name="application-name" content="繁星团契管理系统">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #FBF6EC;
+    --paper-line: #E4DAC5;
+    --surface: #FFFFFF;
+    --ink: #2B2621;
+    --ink-soft: #6B6255;
+    --pine: #33513F;
+    --pine-dark: #22392C;
+    --pine-soft: #DCE8DF;
+    --amber: #A9701C;
+    --amber-soft: #F3E2C4;
+    --brick: #9C4430;
+    --brick-soft: #F4E2DC;
+    --font-display: 'Zilla Slab', Georgia, 'Songti SC', serif;
+    --font-body: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Segoe UI', Helvetica, Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #1E1B16; --paper-line: #3A342B; --surface: #26221C;
+      --ink: #EDE6D8; --ink-soft: #A79C89;
+      --pine: #7FB79A; --pine-dark: #5B9279; --pine-soft: #223B31;
+      --amber: #E0A54B; --amber-soft: #3B2E1A; --brick: #E0937C; --brick-soft: #3A231D;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { height: 100%; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  /* iPhone：连点两下不会突然把页面放大（双指缩放照样能用） */
+  html { touch-action: manipulation; }
+  body {
+    height: 100%; margin: 0;
+    background: var(--paper); color: var(--ink);
+    font-family: var(--font-body);
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+  }
+  h1, h2, h3 { font-family: var(--font-display); margin: 0; }
+  button, input, select { font-family: inherit; }
+  #app { min-height: 100%; display: flex; flex-direction: column; }
+
+  /* ---------- header ---------- */
+  .app-header {
+    position: sticky; top: 0; z-index: 20;
+    background: var(--paper); border-bottom: 1px solid var(--paper-line);
+    padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 10px;
+  }
+  .header-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .header-brand { display: flex; align-items: center; gap: 9px; min-width: 0; }
+  .header-title { font-size: 20px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  @media (max-width: 359px) { .ht-tail { display: none; } }      /* 窄屏只写「繁星团契」，给右边的按钮留地方 */
+  .header-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }   /* 「记录」「退出」隔开一点，免得点错 */
+  .hist-btn {
+    background: none; border: none; color: var(--pine); font-size: 12.5px; font-weight: 600; cursor: pointer;
+    padding: 6px 8px; display: inline-flex; align-items: center; gap: 3px; font-family: inherit;
+  }
+  .hist-btn svg { width: 15px; height: 15px; }
+
+  /* SYM 标志。图本身是白底，做成圆角方块后在深色模式下也像个 App 图标 */
+  .sym-logo {
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJAAAACQBAMAAAAVaP+LAAAAGFBMVEX////+//+Kj5omLkIlLkIlLkEkLkIcJjrYSS/HAAAIhUlEQVR42u1a329TyRX+TgjBZuPMjOtsW2nFj5Tw0GXJIn5UVZzFASO1FaogWtrnVt2/p/9H04aHUqlSDElEWm0VQKFEgRWsY6ssbIrJzMROfQ12pg/xj3vvzLUN7ctKuU/2vfbn75w55ztnzhjYv/av/es7dVHXhxyy+VLAqPcGEkaB+N5rCeJdoaKBBCQJLprvpJGKuHwPICGRFKlM+73JSamEfGcgIZN8NFNa7XzwLJ+XG8TUuwEJmRzPlFaF75ZEtj4XjUSROOnFlqPbUAcyubyOQDoQgXMj9Q8RC92ODz2+IqsafQNRNfnFWpE7HsTXr8hq3OsTiEzyxnI85vzd+PoVucG9/oD44fHnImqV4+tXXmy6kGwgoY+cq0UHXnz95y82HfcHbMPGrj7sllTi7gzjfSw/H/jdHd41PU3lzarpaRrVjnwjegjGUPob8nqZxpJXRU/pWZxRvIdpROcbvKeImcq/lezOiI2neR9qWJ8B7+ojevPbxVgfuhp/1tjsyoiNvXYRstN0+HozBIQTiLZnXCFkLtnG/e34nncldwEx4fR05fYxm9K0AgAxph1ARCeWnC7ZYA5KRzkgVMvEABDXziUzky4pMzMakGKQK3vVYkdeupZMH3myU7UeDP3wcSx+ePzZL16qMCPavuoiJM/eNM8uWqRomcGMps8sX7MY8cOfuvTh1MqTWrUx/TJs2vm/erXdnZef3VRhoPioyzLzdT7mcSnj4Qff/xKoetk/F8LOJu2yzHya1wp6a2MiHBM3GUBbw6307TASTsvo1aFqzOOHx0LFw1z4Eh7Ai54KMzIpZxDtnp/RpMczodvlXaUAqLwMJy3Ff+DO+3yjjg9+uRR0n/n4FryADHUY6YsRGl26TieWeEiQVop7JhkLiImo9oAPhCPeVCbzLFJGUlG1g5bDPcBgek6rCCDSLFpZjweWzJx7O1dkUVWE6Nc6Cmho8nFgwZ6vf8stPwy2HWEnWauBJKvQUXTJjn3YyQ8VAwBz6sdHv20+DBL8pFrVVvlvAcU/ONT6+MCFTQCoPL//5IxrJSnf6ZI6eE0g8sZME8gczZkYYC7cfqkzm+4+4vwhGfMA+ApuyzViquUHxeQEABgtokqcuHdwbyGZsIA6NmQXSqljAMBVZIMuSpcYB2j7N1aKdKDnN0Zm/+muZj6k5eMaYONWQJoDrbjelhoKqletHb7EOdFwp3K3GbW+mvjVMRr/hAcz0pU3DNAZMjyyY8tdH0gXAcjulBLHiY0vqbBpvt6cU2oJQHk1mG9hXHNGEceaZVrHCnqYsJddlrOhsk2aBdSlmWt0uuATICv91bnh2dRu8P5aMD1bb9wiclc16azM5e22dXDJFzaDvfs8la3PbimuEqEAmPwLkHito1YtDCMHL8/P5TUstSLNOEwmvGpOEJApZ+uz+Q1ukmNW+Xx02iVsyo2Urc9KSdBjV5ilbomCC8hdP0qzUhKQFJ/fU6J7Zz3ocG77gdIGXIlkluVErzbeAjLlLACgdMcAjKQeG8046PQGqkzlJABICUAhKT6v96bjADLpOalaG38kRZblqA8YG6hyZ0MIQAIS4KPX+rHKbZqEBEgImIKB6ssqJ1Di40UAlMrg7e+BRr8wDkbf3ACAUg4XuYQ5WnxXIN76Rj0HACQMSajv8XcF8ulayxrFoWX/E63I7Ke1vgZiBfSWkT62kigXWGSlDYSnT4WkAoySCkb65m0y1ESY/5hw1/9mSHl0sL2bMadOfhUbvJD6UA/+9PHwyeYvvNnxvF4yYqDBOvpaWdlJFz9arh/Ynbh99r7c5W5nU8lqjhPTwRxUbx+VH5SkHniQf7j19USTpgo7u+dCG0A3zhgwAAqtSs3tcrTsdHfJt5fhU4wDU4kzqHfgSYW6EcewUjOupc8VOwV62NRYZe/kW4z00/AmkdYC/tzB22OoGFLgpp0HJO3IHrnF3J5phskKx10FAYKCael+eZVZTQQ9HZQqqmgDeu+hAqggqH3fwUiNrJwLbsqM0Ibp9p4H4HsMlTLU5JRQNpDRW7OLViC1a1djGpTmRlDBZNqrbibai+aLbCO26FpYfkxpai+/6e4N3OaJE4lV0scBnn7oq4FBIJJjqSAOMaUHWt5M5CBA94jjX2exO7DEAVQWOoNpH6PkjdeBak6PwLUJCp4AsPuAaSOaU257EEXJL3KbQQXYbng11O1pRoxicQAwJ1fhWYzYwZJVMoQyXCei848pY6+afmUp4nBGd9fZBe7SbLPknHaWLkbrrM9FvjhiZeVM22hhSWtnFbG1jdY4YO6q6DZVuYCU87c7SWKP3uaYk5EZuaUstdVdDk6GdUSBtG0zAlBR3jYTgY2hD0hJq7oR55FqXrnJo0as7MWhYBTTs7pX445JHQBz4e/wImo/PbWsEE41B4DyneB4xA+krFIyPE2ukrcnFiyyGzHm2UV73hsRFpNFFT2GrlUbQX/Qq9exGq84nFS5Dy+6PzIsTElzGKNdhKTpNhi3KA1llhCvXtu0CdVUt47NpkTO3DGTynQd1VuU6OlOzI4kU7nvqe49pEWJuCOSypMFg+6MUKu+3o0HnSQwHIx485M5Ur26WsOeXg5GLJOhOZ6p3ClK9GKEGiv87KuYL91Y/EefBQKgnF6IeUDPsRvh5FXfINSc4I1Ff57LzJ+KjumLQ7f49vlTRcfwr/k2+4eC6zzTceJXY7Ix1PmBeOAUUWbnH3OXHrgOM2vV6tRI0Xn0I7Pz+bhTVyKOVzcapwtx13RjPq+r6BvIE7LamF6vhUjJ+qXZFzpizOUEgidkVWZHCj4oo95e/uiPGzXmRdTvqLGepLFUpt7p4Q5M1xfe41AcEBJCjGbaDWx94f2O6QFiCsn/wx8HAAhfMP4Pf2VoQbXrUs8h5/61f+1f36Xrv4HElJDZIIl1AAAAAElFTkSuQmCC);
+    background-size: contain; background-repeat: no-repeat; background-position: center;
+    background-color: #fff; border-radius: 22%; flex: 0 0 auto; display: block;
+  }
+  .header-logo { width: 27px; height: 27px; }
+  .gate-logo { width: 78px; height: 78px; margin-bottom: 20px; }
+  .header-sub {
+    display: block; margin-top: 2px; font-size: 12.5px; color: var(--ink-soft);
+    background: none; border: none; padding: 2px 0; font-family: inherit; text-align: left; cursor: pointer;
+  }
+  .refresh-ico { opacity: .55; margin-left: 2px; }
+  .signout { background: none; border: none; color: var(--ink-soft); font-size: 12.5px; cursor: pointer; padding: 6px 8px; margin-right: -8px; }
+  .sync-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--pine); margin-right: 5px; vertical-align: middle; }
+  .sync-dot.off { background: var(--amber); }
+
+  main { flex: 1; padding: 12px 16px calc(92px + env(safe-area-inset-bottom, 0px)); max-width: 640px; width: 100%; margin: 0 auto; }
+  main { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  /* 打饭台右下角有悬浮的「+4欧单次」，它占到距底约 123px。
+     留白不够的话，列表最后一个人的按钮会被它盖住点不到。 */
+  main[data-tab="serve"] { padding-bottom: calc(148px + env(safe-area-inset-bottom, 0px)); }
+
+  /* ---------- tabbar ---------- */
+  .tabbar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+    display: flex; background: var(--surface); border-top: 1px solid var(--paper-line);
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px));
+  }
+  .tab-btn {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
+    background: none; border: none; color: var(--ink-soft);
+    padding: 6px 4px; border-radius: 10px; font-size: 11.5px; cursor: pointer;
+  }
+  .tab-btn svg { width: 22px; height: 22px; }
+  .tab-btn.active { color: var(--pine); }
+
+  /* ---------- serve tab ---------- */
+  /* 顶栏也是 sticky top:0，所以搜索框必须停在顶栏下沿，
+     否则滚动时会钻到顶栏底下被盖住。--header-h 由脚本按实际高度写入。 */
+  .search-bar {
+    position: sticky; top: var(--header-h, 56px); z-index: 15;
+    background: var(--paper); padding: 4px 0 10px;
+  }
+  .search-bar input {
+    width: 100%; border: 1px solid var(--paper-line); background: var(--surface); color: var(--ink);
+    border-radius: 10px; padding: 10px 12px; font-size: 16px;
+  }
+  .search-bar input:focus { outline: 2px solid var(--pine); outline-offset: 1px; }
+  /* iPhone 的 Safari 会给输入框套上自己的外观（搜索框尤其明显），统一成页面自己的样式 */
+  .search-bar input, .gate input, .modal-body textarea,
+  .modal-body input[type=text], .modal-body input[type=password], .modal-body input[type=email] { -webkit-appearance: none; appearance: none; }
+  .search-bar input::-webkit-search-decoration { -webkit-appearance: none; }
+  /* 只对 iPhone / iPad 生效：日期框默认按内容定宽、文字居中，和上下的输入框对不齐 */
+  @supports (-webkit-touch-callout: none) {
+    .modal-body input[type=date], .modal-body input[type=time] { -webkit-appearance: none; appearance: none; display: block; min-width: 0; text-align: left; }
+    .modal-body input[type=date]::-webkit-date-and-time-value, .modal-body input[type=time]::-webkit-date-and-time-value { text-align: left; }
+  }
+
+  .section-title { font-size: 13px; color: var(--ink-soft); margin: 16px 2px 6px; }
+
+  /* 小组筛选条：横向滑动，不占竖向空间 */
+  .group-bar {
+    display: flex; gap: 6px; overflow-x: auto; margin-top: 8px; padding-bottom: 2px;
+    scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  }
+  .group-bar::-webkit-scrollbar { display: none; }
+  .group-chip {
+    flex-shrink: 0; border: 1px solid var(--paper-line); background: var(--surface);
+    color: var(--ink-soft); border-radius: 999px; padding: 6px 13px; font-size: 13px; cursor: pointer;
+    font-family: inherit; white-space: nowrap;
+  }
+  .group-chip.active { background: var(--pine); border-color: var(--pine); color: var(--paper); }
+  /* 弹窗里的点选器换行显示：选组要一眼看全，不该藏在横向滚动里 */
+  .group-picker { flex-wrap: wrap; overflow-x: visible; row-gap: 8px; margin-bottom: 4px; }
+  .member-group { font-size: 11.5px; color: var(--ink-soft); font-weight: 400; }
+  .roster-group-head {
+    font-size: 12.5px; color: var(--pine); font-weight: 600; margin: 16px 2px 7px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .roster-group-head::after { content: ''; flex: 1; height: 1px; background: var(--paper-line); }
+  /* 打饭台的分组标题贴在列表上方，比名册页紧凑一点 */
+  .serve-group-head { margin: 12px 2px 6px; }
+  .serve-group-head:first-of-type { margin-top: 2px; }
+
+  .member-row {
+    background: var(--surface); border: 1px solid var(--paper-line);
+    border-radius: 12px; padding: 12px; margin-bottom: 8px;
+  }
+  .member-row.exhausted { background: var(--pine-soft); border-color: var(--pine); }
+  .member-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .member-name-wrap { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .member-name { font-size: 16px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .badge { font-size: 11px; padding: 3px 9px; border-radius: 999px; white-space: nowrap; border: none; font-family: inherit; }
+  button.badge { cursor: pointer; }
+  .badge-paid { background: var(--pine-soft); color: var(--pine-dark); }
+  .badge-unpaid { background: var(--amber-soft); color: var(--amber); }
+  .badge-none { background: var(--paper-line); color: var(--ink-soft); }
+
+  .punches { display: flex; gap: 8px; margin-top: 10px; }
+  .punch {
+    width: 38px; height: 38px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-family: var(--font-display); font-weight: 600;
+    border: 1.6px dashed var(--paper-line); color: var(--ink-soft);
+    position: relative; flex-shrink: 0; touch-action: manipulation;
+    -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+  }
+  /* 圆圈外再加一圈看不见的可点范围（约 46px 见方）：
+     手指比圆圈粗，点在圆圈的「四个角」上也要算点中 */
+  .punch.next::before, .punch.filled::before { content: ''; position: absolute; top: -5.5px; right: -5.5px; bottom: -5.5px; left: -5.5px; }
+  .punch.filled { border-style: solid; border-color: var(--pine); background: var(--pine); color: var(--paper); cursor: pointer; }
+  .punch.next { border-color: var(--pine); color: var(--pine); font-size: 17px; cursor: pointer; }
+  .punch.pending { opacity: .55; }
+  .punch.disabled { opacity: .4; }
+
+  .quick-issue-btn {
+    font-size: 12.5px; color: var(--pine); background: var(--pine-soft);
+    border: none; border-radius: 8px; padding: 6px 10px; cursor: pointer; white-space: nowrap;
+  }
+
+  .fab {
+    position: fixed; right: 16px; bottom: calc(80px + env(safe-area-inset-bottom, 0px)); z-index: 25;
+    right: max(16px, env(safe-area-inset-right, 0px));   /* 横屏时别钻到刘海底下 */
+    background: var(--amber); color: #fff; border: none; border-radius: 999px;
+    padding: 13px 18px; font-size: 14.5px; font-weight: 600;
+    box-shadow: 0 6px 16px rgba(0,0,0,.18); cursor: pointer;
+  }
+
+  .empty-state { text-align: center; color: var(--ink-soft); padding: 40px 12px; font-size: 14px; line-height: 1.7; }
+
+  /* ---------- roster ---------- */
+  .roster-row {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--surface); border: 1px solid var(--paper-line);
+    border-radius: 12px; padding: 12px; margin-bottom: 8px; cursor: pointer;
+  }
+  .roster-row .rn { font-size: 15.5px; font-weight: 600; }
+  .roster-row .rp { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+  .chev { color: var(--ink-soft); font-size: 18px; }
+  .roster-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }   /* 名册：没有饭卡的人旁边的「开卡」 */
+  /* 打饭台：名册里没有饭卡的人（搜名字时才出现在下面） */
+  .member-row.nocard { background: var(--paper); border-style: dashed; }
+  .serve-note { text-align: center; margin: 12px 4px 0; }
+  .serve-more { text-align: center; margin: 4px 4px 0; }
+  /* 修改记录 */
+  .hist-note { margin: 0 0 8px; }
+  .hist-actors { margin: 0 0 6px; }
+  .hist-day { font-size: 12.5px; color: var(--pine); font-weight: 600; margin: 12px 2px 2px; }
+  .hist-item { padding: 7px 2px; border-bottom: 1px solid var(--paper-line); }
+  .hist-head { display: flex; gap: 8px; align-items: baseline; font-size: 12px; color: var(--ink-soft); }
+  .hist-who { font-weight: 600; color: var(--ink); }
+  .hist-text { font-size: 14px; margin-top: 1px; line-height: 1.5; word-break: break-word; }
+  .m-hist .hist-item:last-child { border-bottom: none; }
+  .add-btn {
+    width: 100%; border: 1.4px dashed var(--paper-line); background: none; color: var(--pine);
+    border-radius: 12px; padding: 12px; font-size: 14.5px; font-weight: 600; cursor: pointer; margin-top: 4px;
+  }
+
+  /* ---------- 签到 ---------- */
+  .att-datebar { display: flex; align-items: center; gap: 8px; margin: 2px 0 8px; }
+  .att-nav {
+    flex: 0 0 44px; height: 44px; border-radius: 12px; border: 1px solid var(--paper-line);
+    background: var(--surface); color: var(--ink); font-size: 22px; line-height: 1; cursor: pointer; font-family: inherit;
+  }
+  .att-nav:disabled { opacity: .35; cursor: default; }
+  .att-date {
+    position: relative; flex: 1; min-width: 0; height: 44px; display: flex; align-items: center; justify-content: center; gap: 8px;
+    background: var(--surface); border: 1px solid var(--paper-line); border-radius: 12px;
+  }
+  .att-date-main { font-family: var(--font-display); font-size: 17px; font-weight: 700; white-space: nowrap; }
+  .att-date-sub { font-size: 12px; color: var(--ink-soft); white-space: nowrap; }
+  .att-date-sub.is-today { color: var(--pine); font-weight: 600; }
+  /* 日期本身就是一个看不见的下拉框：点日期就弹出周日列表（iPhone 是底部的滚轮） */
+  #attDatePick {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0;
+    border: 0; padding: 0; margin: 0; cursor: pointer; font-size: 16px; -webkit-appearance: none; appearance: none;
+  }
+  .att-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+  .att-stat {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; min-height: 48px; min-width: 0;
+    padding: 6px 2px; border-radius: 12px; border: 1px solid var(--paper-line); background: var(--surface);
+    color: var(--ink-soft); cursor: pointer; font-family: inherit;
+  }
+  .att-stat b { font-family: var(--font-display); font-size: 19px; line-height: 1.15; color: var(--ink); }
+  .att-stat span { font-size: 11px; white-space: nowrap; }
+  .att-stat.s-present b { color: var(--pine); }
+  .att-stat.s-late b { color: var(--amber); }
+  .att-stat.s-absent b { color: var(--brick); }
+  .att-stat.active { border-color: var(--pine); box-shadow: inset 0 0 0 1px var(--pine); background: var(--pine-soft); }
+  .att-rule { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12.5px; color: var(--ink-soft); margin: 8px 2px 4px; min-height: 30px; }
+  .link-btn {
+    background: none; border: none; color: var(--pine); font-size: 13px; font-weight: 600; padding: 8px 4px; cursor: pointer;
+    font-family: inherit; white-space: nowrap; text-decoration: underline; text-underline-offset: 3px;
+  }
+  .att-row {
+    display: flex; align-items: center; gap: 6px; background: var(--surface); border: 1px solid var(--paper-line);
+    border-radius: 12px; padding: 5px 6px 5px 2px; margin-bottom: 8px;
+  }
+  .att-row.pending .att-pill, .att-row.pending .att-in, .att-row.pending .att-fix { opacity: .6; }
+  .att-who {
+    flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 8px;
+    background: none; border: none; text-align: left; color: var(--ink); cursor: pointer; font-family: inherit;
+  }
+  .att-in, .att-pill, .att-fix {
+    flex: 0 0 auto; min-width: 86px; min-height: 44px; border-radius: 10px; font-size: 15px; font-weight: 600;
+    cursor: pointer; font-family: inherit; padding: 0 12px; touch-action: manipulation; white-space: nowrap;
+  }
+  .att-in { background: var(--pine); color: var(--paper); border: none; }
+  .att-fix { background: none; color: var(--pine); border: 1.4px solid var(--pine); }   /* 过去的周日：补签 */
+  .att-pill { border: none; }
+  .att-pill.att-present { color: var(--pine); background: var(--pine-soft); }
+  .att-pill.att-late { color: var(--amber); background: var(--amber-soft); }
+  .att-pill.att-absent { color: var(--brick); background: var(--brick-soft); }
+  .att-meal { font-size: 11px; color: var(--amber); background: var(--amber-soft); border-radius: 999px; padding: 2px 8px; white-space: nowrap; }
+  .att-head-n { font-weight: 400; color: var(--ink-soft); }
+  .att-note { text-align: center; }
+  .att-hist { display: flex; flex-wrap: wrap; gap: 6px; }
+  .att-chip { font-size: 12px; border-radius: 999px; padding: 3px 9px; white-space: nowrap; }
+  .att-chip.att-present { background: var(--pine-soft); color: var(--pine); }
+  .att-chip.att-late { background: var(--amber-soft); color: var(--amber); }
+  .att-chip.att-absent { background: var(--brick-soft); color: var(--brick); }
+  /* 补签 / 改签到的小表单 */
+  .as-time { display: flex; align-items: center; gap: 8px; }
+  .as-time input { flex: 1; min-width: 0; margin-bottom: 0; }
+  .as-seg { display: flex; gap: 8px; }
+  .as-st {
+    flex: 1; min-height: 44px; border-radius: 10px; border: 1.4px solid var(--paper-line); background: var(--paper);
+    color: var(--ink-soft); font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer; touch-action: manipulation;
+  }
+  .as-st.s-present.active { border-color: var(--pine); background: var(--pine-soft); color: var(--pine); }
+  .as-st.s-late.active { border-color: var(--amber); background: var(--amber-soft); color: var(--amber); }
+  .as-warn { color: var(--brick); font-weight: 600; }
+
+  /* ---------- finance ---------- */
+  .period-bar { margin: 0 0 10px; }
+  .ledger { background: var(--surface); border: 1px solid var(--paper-line); border-radius: 12px; padding: 8px 14px; }
+  .ledger-row { display: flex; justify-content: space-between; align-items: baseline; padding: 6px 0; font-size: 14.5px; }
+  .ledger-row strong { font-family: var(--font-display); font-size: 17px; }
+  .ledger-row.total { border-top: 1px dashed var(--paper-line); margin-top: 4px; padding-top: 10px; }
+  .ledger-row strong.neg { color: var(--brick); }
+  .ledger-sub { font-size: 12px; color: var(--ink-soft); margin: -2px 0 4px; }
+  .exp-amt { color: var(--brick); font-weight: 600; white-space: nowrap; align-self: center; }
+  .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--paper-line); border-radius: 12px; padding: 12px 8px; text-align: center; }
+  .stat-value { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--pine-dark); }
+  .stat-label { font-size: 11px; color: var(--ink-soft); margin-top: 2px; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .stat-value { color: var(--pine); } }
+
+  .chart { background: var(--surface); border: 1px solid var(--paper-line); border-radius: 12px; padding: 14px 10px 8px; }
+  .bars { display: flex; align-items: flex-end; gap: 8px; height: 110px; }
+  .bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
+  .bar { width: 60%; background: var(--pine); border-radius: 4px 4px 0 0; min-height: 3px; }
+  .bar-count { font-size: 10.5px; color: var(--ink-soft); margin-bottom: 2px; }
+  .bar-label { font-size: 10px; color: var(--ink-soft); margin-top: 6px; }
+
+  .list-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding: 10px 2px; border-bottom: 1px solid var(--paper-line); font-size: 13.5px;
+  }
+  .list-row:last-child { border-bottom: none; }
+  .list-meta { color: var(--ink-soft); font-size: 12px; }
+  .icon-btn { background: none; border: none; color: var(--brick); font-size: 18px; cursor: pointer; padding: 2px 8px; }
+  .mini-btn { background: var(--pine-soft); color: var(--pine-dark); border: none; border-radius: 8px; padding: 5px 10px; font-size: 12px; cursor: pointer; white-space: nowrap; }
+  .mini-btn.danger { background: none; color: var(--brick); }
+  .row-btns { display: flex; gap: 6px; flex-shrink: 0; }
+  .link-danger { display: block; margin: 18px auto 0; background: none; border: none; color: var(--brick); font-size: 13px; padding: 8px 14px; cursor: pointer; font-family: inherit; }
+
+  .export-btn {
+    width: 100%; background: var(--pine); color: var(--paper); border: none;
+    border-radius: 12px; padding: 13px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 18px;
+  }
+
+  /* ---------- modal ---------- */
+  .modal-overlay { position: fixed; top: 0; right: 0; bottom: 0; left: 0; background: rgba(20,17,13,.45); display: flex; align-items: flex-end; justify-content: center; z-index: 100; }
+  @media (min-width: 560px) { .modal-overlay { align-items: center; } }
+  .modal-card {
+    background: var(--surface); width: 100%; max-width: 420px;
+    border-radius: 16px 16px 0 0; padding: 18px 18px calc(18px + env(safe-area-inset-bottom, 0px));
+    max-height: 86vh; max-height: calc(100% - 24px); overflow-y: auto; -webkit-overflow-scrolling: touch;
+  }
+  @media (min-width: 560px) { .modal-card { border-radius: 16px; } }
+  .modal-title { font-size: 17px; font-weight: 700; margin-bottom: 10px; font-family: var(--font-display); }
+  .modal-body { font-size: 14px; line-height: 1.6; }
+  .modal-body input {
+    width: 100%; border: 1px solid var(--paper-line); background: var(--paper); color: var(--ink);
+    border-radius: 10px; padding: 10px 12px; font-size: 16px; margin-bottom: 4px;
+  }
+  .field-label { font-size: 12.5px; color: var(--ink-soft); margin: 10px 0 4px; }
+  .modal-body input[type=date], .modal-body input[type=time] { min-height: 44px; font-family: inherit; }
+  .modal-body select {
+    width: 100%; min-height: 44px; border: 1px solid var(--paper-line); background-color: var(--paper); color: var(--ink);
+    border-radius: 10px; padding: 10px 34px 10px 12px; font-size: 16px; font-family: inherit; margin-bottom: 4px;
+    -webkit-appearance: none; appearance: none; cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%238C8273' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 13px center; background-size: 12px 8px;
+  }
+  .modal-body textarea {
+    width: 100%; border: 1px solid var(--paper-line); background: var(--paper); color: var(--ink);
+    border-radius: 10px; padding: 10px 12px; font-size: 16px; font-family: inherit;
+    resize: vertical; line-height: 1.6;
+  }
+  .modal-body input[type=file] { width: 100%; font-size: 13px; color: var(--ink-soft); }
+  .imp-hint { color: var(--ink-soft); font-size: 12.5px; line-height: 1.7; margin-bottom: 10px; }
+  .imp-or { text-align: center; color: var(--ink-soft); font-size: 12px; margin: 12px 0 8px; }
+  .imp-preview { margin-top: 12px; font-size: 13px; }
+  .imp-names { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; max-height: 150px; overflow-y: auto; }
+  .imp-chip { background: var(--pine-soft); color: var(--pine-dark); border-radius: 6px; padding: 3px 8px; font-size: 12px; }
+  .imp-chip.dup { background: var(--paper-line); color: var(--ink-soft); text-decoration: line-through; }
+  .modal-actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .btn { flex: 1; min-width: 90px; border: none; border-radius: 10px; padding: 11px; font-size: 14.5px; font-weight: 600; cursor: pointer; }
+  .btn-primary { background: var(--pine); color: var(--paper); }
+  .btn-secondary { background: var(--paper-line); color: var(--ink); }
+  .btn-danger { background: var(--brick); color: #fff; }
+  .btn-ghost { background: none; color: var(--ink-soft); }
+
+  /* ---------- login / setup ---------- */
+  .gate { max-width: 400px; margin: 0 auto; padding: 48px 20px; }
+  .gate h1 { font-size: 26px; margin-bottom: 6px; }
+  .gate p { color: var(--ink-soft); font-size: 14px; line-height: 1.7; margin: 0 0 20px; }
+  .gate label { display: block; font-size: 12.5px; color: var(--ink-soft); margin-bottom: 4px; }
+  .gate input {
+    width: 100%; border: 1px solid var(--paper-line); background: var(--surface); color: var(--ink);
+    border-radius: 10px; padding: 12px; font-size: 16px; margin-bottom: 12px;
+  }
+  .gate button[type=submit] {
+    width: 100%; background: var(--pine); color: var(--paper); border: none;
+    border-radius: 10px; padding: 13px; font-size: 15px; font-weight: 600; cursor: pointer;
+  }
+  .gate button[type=submit]:disabled { opacity: .55; }
+  .gate-error { color: var(--brick); font-size: 13.5px; margin-top: 12px; min-height: 18px; }
+  .gate-link { display: block; margin: 14px auto 0; background: none; border: none; color: var(--ink-soft); font-size: 13px; padding: 8px 12px; cursor: pointer; font-family: inherit; text-decoration: underline; text-underline-offset: 3px; }
+  .gate-small { font-size: 12px; color: var(--ink-soft); }
+  .install-link {
+    display: block; width: 100%; margin: 22px 0 0; padding: 12px; font-family: inherit; font-size: 14px; cursor: pointer;
+    background: var(--pine-soft); color: var(--pine); font-weight: 600; border: none; border-radius: 10px;
+  }
+  .install-steps { margin: 0 0 10px; padding-left: 22px; }
+  .install-steps li { margin-bottom: 7px; }
+  .install-note { color: var(--ink-soft); font-size: 13px; line-height: 1.7; }
+  [hidden] { display: none !important; }
+  .gate code {
+    display: block; background: var(--surface); border: 1px solid var(--paper-line);
+    border-radius: 8px; padding: 10px 12px; font-size: 12.5px; margin: 8px 0; word-break: break-all;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+  }
+  .gate ol { padding-left: 20px; color: var(--ink-soft); font-size: 14px; line-height: 1.9; }
+
+  .loading-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 90px 20px; color: var(--ink-soft); font-size: 14px; gap: 12px; }
+  .spinner { width: 26px; height: 26px; border-radius: 50%; border: 3px solid var(--paper-line); border-top-color: var(--pine); animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 2.4s; } }
+
+  #toast-root { position: fixed; left: 0; right: 0; bottom: calc(150px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; align-items: center; gap: 6px; z-index: 200; pointer-events: none; }
+  /* 弹窗（比如补签表单）开着的时候，提示改到屏幕最上面，不挡住正在填的时间框和按钮 */
+  #modal-root:not(:empty) ~ #toast-root { top: calc(14px + env(safe-area-inset-top, 0px)); bottom: auto; }
+  .toast { background: var(--ink); color: var(--paper); padding: 10px 16px; border-radius: 999px; font-size: 13.5px; box-shadow: 0 4px 10px rgba(0,0,0,.2); max-width: 84vw; text-align: center; }
+
+  .stat-note { font-size: 12px; color: var(--ink-soft); margin: 8px 2px 0; line-height: 1.6; }
+  .hidden-box { margin-top: 18px; border-top: 1px dashed var(--paper-line); padding-top: 10px; }
+  .hidden-box summary { font-size: 13px; color: var(--ink-soft); cursor: pointer; padding: 6px 2px; }
+  .gate-actions { display: flex; gap: 10px; margin-top: 18px; }
+  .gate-btn { flex: 1; border: none; border-radius: 10px; padding: 12px; font-size: 15px; font-weight: 600; cursor: pointer; background: var(--pine); color: var(--paper); font-family: inherit; }
+  .gate-btn.ghost { background: var(--paper-line); color: var(--ink); }
+  .app-header { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .tabbar { padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); }
+
+  /* 手机横过来时屏幕很矮：顶栏和搜索框不再吸顶、底栏变扁，
+     否则留给名单的只有五十来个像素，一行都放不下 */
+  @media (max-height: 520px) {
+    .app-header { position: static; padding-top: calc(8px + env(safe-area-inset-top, 0px)); padding-bottom: 6px; }
+    .search-bar { position: static; }
+    .tab-btn { flex-direction: row; justify-content: center; gap: 6px; padding: 7px 4px; font-size: 12.5px; }
+    .tab-btn svg { width: 19px; height: 19px; }
+    .tabbar { padding-top: 2px; padding-bottom: calc(2px + env(safe-area-inset-bottom, 0px)); }
+    .fab { bottom: calc(52px + env(safe-area-inset-bottom, 0px)); padding: 9px 14px; font-size: 13.5px; }
+    main { padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
+    main[data-tab="serve"] { padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px)); }
+    .modal-card { max-height: 94vh; max-height: calc(100% - 8px); }
+    .gate { padding-top: 20px; }
+    #toast-root { bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="loading-screen" id="bootScreen">
+    <div class="spinner"></div>
+    <div>正在启动…</div>
+  </div>
+</div>
+<div id="modal-root"></div>
+<div id="toast-root"></div>
+
+<script src="config.js"></script>
+<script>
+  /* 组件库（从 CDN 下载）加载失败时，模块脚本一行都不会执行，页面会永远停在「正在启动」。
+     这里单独放一个不依赖任何库的小脚本：10 秒还没启动就给出提示和重试按钮。
+     如果只是网慢、之后加载成功了，正常页面会自动把这段提示替换掉。 */
+  setTimeout(function () {
+    if (window.__mealcardBooted) return;
+    var app = document.getElementById('app');
+    if (!app) return;
+    app.innerHTML = '<div class="gate"><h1>页面没能加载完</h1>'
+      + '<p>网络不太好，或者页面需要的组件暂时下载不了。</p>'
+      + '<div class="gate-actions"><button type="button" class="gate-btn" onclick="location.reload()">重试</button></div></div>';
+  }, 10000);
+</script>
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm';
+window.__mealcardBooted = true;          // 组件库加载成功（页面顶部的「看门狗」据此判断）
+
+/* ============================================================
+   小工具
+   ============================================================ */
+const $ = (id) => document.getElementById(id);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+}
+
+/* 日期一律按巴塞罗那时间算：有的管理员手机设的是北京时间，
+   不固定时区的话，周日傍晚的打卡会被记成周一。 */
+const TZ = 'Europe/Madrid';
+const _madrid = new Intl.DateTimeFormat('en-US', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+function madridParts(d) { const o = {}; for (const p of _madrid.formatToParts(d)) o[p.type] = p.value; return o; }
+function fmtDate(d) { const o = madridParts(d); return `${o.year}-${o.month}-${o.day}`; }
+function fmtTime(d) { const o = madridParts(d); return `${o.hour}:${o.minute}`; }
+const todayStr = () => fmtDate(new Date());
+function fmtShort(s) { const p = String(s).split('-'); return p[1] + '/' + p[2]; }
+/* 按日历算日期（'2026-10-04' 这种字符串），用正午 UTC 避开夏令时切换那天的坑 */
+const WEEKDAY = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+const weekdayOf = s => new Date(s + 'T12:00:00Z').getUTCDay();          // 0 = 周日
+function addDays(s, n) { const d = new Date(s + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); }
+const prevSunday = s => addDays(s, -(weekdayOf(s) || 7));               // s 之前的那个周日
+const nextSunday = s => addDays(s, 7 - weekdayOf(s));                   // s 之后的那个周日
+function fmtCn(s) { const p = String(s).split('-'); return `${+p[1]}月${+p[2]}日 ${WEEKDAY[weekdayOf(s)]}`; }
+const nowHM = () => fmtTime(new Date());
+function toDate(s) { return s instanceof Date ? s : new Date(typeof s === 'string' && /^\d{4}-\d{2}-\d{2} \d/.test(s) ? s.replace(' ', 'T') : s); }
+
+/* 记录的 ID 由手机自己生成：网络抖动时重发同一条也不会记成两条 */
+function uuid() {
+  if (window.crypto?.randomUUID) return crypto.randomUUID();
+  const b = crypto.getRandomValues(new Uint8Array(16));
+  b[6] = (b[6] & 0x0f) | 0x40; b[8] = (b[8] & 0x3f) | 0x80;
+  const h = [...b].map(x => x.toString(16).padStart(2, '0')).join('');
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
+}
+
+function toast(msg, ms = 2400) {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  $('toast-root').appendChild(el);
+  setTimeout(() => {
+    el.style.transition = 'opacity .3s';
+    el.style.opacity = '0';
+    setTimeout(() => el.remove(), 300);
+  }, ms);
+}
+const vibrate = ms => { try { navigator.vibrate && navigator.vibrate(ms); } catch {} };
+
+/* ---------- 错误：统一翻译成管理员看得懂的话 ---------- */
+function must(res) {
+  if (res.error) {
+    const e = new Error(res.error.message || '未知错误');
+    e.code = res.error.code || ''; e.hint = res.error.hint || ''; e.status = res.status ?? 0;
+    throw e;
+  }
+  return res.data;
+}
+const isNetErr = e => e?.status === 0 || /Failed to fetch|NetworkError|Load failed|network|AbortError|timed? ?out/i.test(String(e?.message || e));
+function friendly(e, what = '保存失败') {
+  const m = String(e?.message || '');
+  if (/card_full/.test(m)) return '这张卡 5 次已经用完了（可能另一台手机刚打过），已刷新';
+  if (/card_archived/.test(m)) return '这张卡已经作废了（可能另一台手机刚开了新卡），已刷新';
+  if (/member_has_active_card/.test(m)) return '这个人已经有一张使用中的卡（可能另一台手机刚开过），已刷新';
+  if (/already_used_today/.test(m)) return '这张卡今天已经用过了（可能是另一台手机刚打的），已刷新';
+  if (/card_not_found|member_not_found/.test(m) || e?.code === '23503') return '这个人刚被另一台手机删除了，已刷新';
+  if (/bad_date/.test(m)) return '不能给还没到的日子签到';
+  if (/future_time/.test(m)) return '签到时间不能晚于现在';
+  if (/bad_time/.test(m)) return '时间要写成 13:32 这样';
+  if (/card_replaced/.test(m)) return '这个人已经换了新卡（可能是另一台手机刚开的），旧卡上的记录不能再撤销，已刷新';
+  if (/member_name_exists/.test(m)) return '名册里已经有这个名字了（可能是另一台手机刚加的）';
+  if (e?.code === 'PGRST116') return '这条记录已经被另一台手机改动或删除了，已刷新';
+  if (e?.code === '40P01' || e?.code === '40001') return `两台手机同时改到了同一个人，${what === '保存失败' ? '这次没保存上' : what}，请再点一次`;
+  if (isNetErr(e)) return `网络不太好，${what === '保存失败' ? '这次没保存上' : what}。网络恢复后页面会自动核对`;
+  if (e?.status >= 500) return `Supabase 服务器暂时出错（${e.status}），${what === '保存失败' ? '这次没保存上' : what}，请稍后再试`;
+  if (/JWT|expired|401|403/i.test(m)) return '登录已过期，请点右上角「退出」后重新登录';
+  return `${what}：${m}`;
+}
+
+/* ---------- 弹窗 ---------- */
+const modalStack = [];
+function showModal({ title, bodyHtml = '', buttons = [] }) {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+
+  /* 触摸设备上的「幽灵点击」：手指抬起后，浏览器还会在同一坐标补发一次
+     click。弹窗正是在手指抬起那一刻弹出来的，所以那一下会落在刚出现的
+     弹窗上——要么把它立刻关掉，要么误按里面的按钮。
+     判据不是时间，而是「这次 click 之前有没有在弹窗里按下过」：
+     真实的点按一定是 pointerdown → click 成对出现；补发的那次只有 click。 */
+  let pressedInside = false;
+  overlay.addEventListener('pointerdown', () => { pressedInside = true; }, true);
+  overlay.addEventListener('click', e => {
+    const fromKeyboard = e.detail === 0;          // 键盘回车触发的 click 没有 pointerdown
+    if (!pressedInside && !fromKeyboard) {
+      e.stopImmediatePropagation();
+      e.preventDefault();
+    }
+    pressedInside = false;
+  }, true);
+
+  const card = document.createElement('div');
+  card.className = 'modal-card';
+  card.innerHTML = `<div class="modal-title">${esc(title)}</div><div class="modal-body">${bodyHtml}</div>`;
+  const actions = document.createElement('div');
+  actions.className = 'modal-actions';
+  const entry = { overlay };
+  const close = () => {
+    overlay.remove();
+    const i = modalStack.indexOf(entry); if (i >= 0) modalStack.splice(i, 1);
+  };
+  entry.close = close;
+  buttons.forEach(b => {
+    const btn = document.createElement('button');
+    btn.className = 'btn ' + (b.variant || 'btn-secondary');
+    btn.textContent = b.label;
+    btn.addEventListener('click', () => b.onClick && b.onClick(close));
+    actions.appendChild(btn);
+  });
+  entry.primary = () => actions.querySelector('.btn-primary');
+  card.appendChild(actions);
+  overlay.appendChild(card);
+  overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+  $('modal-root').appendChild(overlay);
+  modalStack.push(entry);
+  return { close, card };
+}
+/* 电脑上：Esc 关闭弹窗；在输入框里按回车 = 点主按钮（输入法选字时的回车不算） */
+document.addEventListener('keydown', e => {
+  const top = modalStack[modalStack.length - 1];
+  if (!top) return;
+  if (e.key === 'Escape') { e.preventDefault(); top.close(); return; }
+  if (e.key === 'Enter' && !e.isComposing && e.keyCode !== 229 && e.target.tagName === 'INPUT'
+      && top.overlay.contains(e.target)) {
+    const p = top.primary();
+    if (p) { e.preventDefault(); p.click(); }
+  }
+});
+
+/* 打卡圆圈的点按识别。整页只挂一次，列表怎么重画都不受影响：
+   - 手指按下时就记住按的是哪个圆圈（哪张卡、哪条记录），抬手时照记下的执行。
+     这样哪怕按着的这一下列表刚好被重画、圆圈换成了新的，这次点按也不会丢；
+   - 手指移动超过 12px 是在滑动翻页，不算点；浏览器接管成滚动（pointercancel）也不算；
+   - 已打的孔：点一下，或者长按 0.48 秒，都弹出撤销确认；
+   - 「+」按多久都算一次（跟手机上的普通按钮一样），只要手指没有滑走。 */
+const TAP_SLOP = 12, LONG_PRESS_MS = 480;
+let press = null;
+function endPress() { if (press && press.timer) clearTimeout(press.timer); press = null; }
+document.addEventListener('pointerdown', e => {
+  if (press && performance.now() - press.t < 4000) return;   // 已经有一根手指按着，忽略第二根
+  endPress();
+  if (e.pointerType === 'mouse' && e.button !== 0) return;     // 鼠标右键、中键不算
+  const el = e.target.closest && e.target.closest('#serveList .punch.next, #serveList .punch.filled');
+  if (!el) return;
+  const p = press = {
+    id: e.pointerId, next: el.classList.contains('next'), data: { ...el.dataset },
+    x: e.clientX, y: e.clientY, t: performance.now(), timer: null, fired: false
+  };
+  if (!p.next) p.timer = setTimeout(() => {
+    if (press !== p) return;
+    p.fired = true;
+    vibrate(15);
+    askRevoke(p.data.usage);
+  }, LONG_PRESS_MS);
+});
+document.addEventListener('pointermove', e => {
+  if (!press || e.pointerId !== press.id) return;
+  if (Math.abs(e.clientX - press.x) > TAP_SLOP || Math.abs(e.clientY - press.y) > TAP_SLOP) endPress();
+});
+document.addEventListener('pointerup', e => {
+  if (!press || e.pointerId !== press.id) return;
+  const p = press;
+  endPress();
+  if (p.fired) return;                                          // 长按已经弹过框了
+  if (p.next) punch(p.data.punchCard, p.data.punchMember);
+  else askRevoke(p.data.usage);
+});
+document.addEventListener('pointercancel', e => { if (press && e.pointerId === press.id) endPress(); });
+document.addEventListener('contextmenu', e => { if (e.target.closest && e.target.closest('.punch')) e.preventDefault(); });
+const noop = () => {};
+
+/* ============================================================
+   状态
+   ============================================================ */
+let sb = null, SB_URL = '', SB_KEY = '';
+/* 共用管理员账号：大家只输同一个密码。Supabase 里这个账号必须有个邮箱形式的名字，
+   但它不用是真的邮箱，也不会收任何邮件（config.js 里可以改成别的）。 */
+const SHARED_ACCOUNT_DEFAULT = 'admin@star-mealcard.pages.dev';
+let SHARED_ACCOUNT = SHARED_ACCOUNT_DEFAULT;
+const isShared = () => (state.user?.email || '').toLowerCase() === SHARED_ACCOUNT;
+/* 每台手机记住上次用的是「打饭台」还是「签到」：门口签到的那台一打开就是签到，打饭的那台就是打饭台。
+   名册、财务是偶尔去一下的，不记——下次打开还是回到干活的那一页 */
+const TABS = ['serve', 'attend', 'roster', 'finance'];
+const TAB_KEY = 'mealcard.tab';
+function savedTab() { try { return localStorage.getItem(TAB_KEY) === 'attend' ? 'attend' : 'serve'; } catch { return 'serve'; } }
+function rememberTab(t) { if (t !== 'serve' && t !== 'attend') return; try { localStorage.setItem(TAB_KEY, t); } catch {} }
+const state = {
+  user: null,
+  members: [], cards: [], usages: [], cashLogs: [], expenses: [], attendance: [], settings: [],
+  tab: savedTab(),
+  finPeriod: 'month',   // 财务页「收支算账」看哪段时间：month / lastMonth / year / all
+  search: '',
+  group: '',            // '' = 全部小组，'__none__' = 未分组
+  attDate: '',          // 签到页看的是哪个周日（每天第一次打开自动选：今天是周日就是今天，不然是上一个周日）
+  attSearch: '', attGroup: '', attFilter: '',   // 签到页自己的搜索、小组、状态筛选（'' / present / late / rest = 未签或缺席）
+  realtimeOk: false,
+  pendingOps: 0
+};
+const TABLE_KEY = { members: 'members', meal_cards: 'cards', card_usages: 'usages', cash_logs: 'cashLogs', expenses: 'expenses',
+                    attendance: 'attendance', app_settings: 'settings' };
+
+/* 所有对本地数据的改动都走这几个函数，便于统一维护索引 */
+let dataVersion = 0;
+function upsertRow(table, row) {
+  if (!row || !row.id) return;
+  const arr = state[TABLE_KEY[table]];
+  const i = arr.findIndex(x => x.id === row.id);
+  if (i >= 0) { const m = { ...arr[i], ...row }; delete m._pending; arr[i] = m; }
+  else arr.push({ ...row });
+  dataVersion++;
+}
+function removeRow(table, id) {
+  const k = TABLE_KEY[table];
+  state[k] = state[k].filter(x => x.id !== id);
+  dataVersion++;
+}
+function patchRow(table, id, patch) {
+  const arr = state[TABLE_KEY[table]];
+  const i = arr.findIndex(x => x.id === id);
+  if (i >= 0) { arr[i] = { ...arr[i], ...patch }; dataVersion++; }
+}
+function setSnapshot(snap) {
+  const dedupe = rows => [...new Map(rows.map(r => [r.id, r])).values()];
+  state.members = dedupe(snap.members); state.cards = dedupe(snap.cards);
+  state.usages = dedupe(snap.usages); state.cashLogs = dedupe(snap.cashLogs);
+  state.expenses = dedupe(snap.expenses || []);
+  state.attendance = dedupe(snap.attendance || []); state.settings = dedupe(snap.settings || []);
+  dataVersion++;
+}
+
+/* ============================================================
+   数据层
+   ============================================================ */
+/* Supabase 默认一次最多只给 1000 行，而且超出部分会被悄悄截掉。
+   打卡记录大约八个月就会超过 1000 条，所以必须分页把全部取回来。 */
+async function fetchAll(table) {
+  const PAGE = 1000;
+  const first = await sb.from(table).select('*', { count: 'exact' }).order('id').limit(PAGE);
+  let rows = must(first) || [];
+  const total = first.count;
+  while (rows.length && (total == null ? rows.length % PAGE === 0 : rows.length < total)) {
+    const more = must(await sb.from(table).select('*').order('id').gt('id', rows[rows.length - 1].id).limit(PAGE)) || [];
+    if (!more.length) break;
+    rows = rows.concat(more);
+  }
+  return rows;
+}
+async function loadAll() {
+  const [members, cards, usages, cashLogs, expenses, attendance, settings] = await Promise.all(
+    ['members', 'meal_cards', 'card_usages', 'cash_logs', 'expenses', 'attendance', 'app_settings'].map(fetchAll));
+  return { members, cards, usages, cashLogs, expenses, attendance, settings };
+}
+
+/* 全量刷新：断线重连、解锁屏幕、网络恢复、手动刷新时调用。
+   刷新途中如果本机正在保存，或者期间收到了实时推送，都要妥善合并，
+   不能用一份「过时的快照」把刚打上的卡盖掉。 */
+let writeSeq = 0, reloadPromise = null, reloadQueued = false, liveEvents = null, lastFullLoad = 0;
+function fullReload({ silent = true } = {}) {
+  if (reloadPromise) { reloadQueued = true; return reloadPromise; }
+  reloadPromise = (async () => {
+    let attempts = 0;
+    do {
+      reloadQueued = false;
+      liveEvents = [];
+      const seq = writeSeq;
+      let snap;
+      try { snap = await loadAll(); }
+      catch (e) { liveEvents = null; if (!silent) throw e; console.warn('刷新失败', e); return false; }
+      if ((state.pendingOps > 0 || writeSeq !== seq) && ++attempts < 10) { reloadQueued = true; await sleep(400); continue; }
+      if (!state.user) { liveEvents = null; return false; }   // 这期间登录失效了：拿到的是空数据，不能用
+      const events = liveEvents; liveEvents = null;
+      setSnapshot(snap);
+      for (const ev of events) applyEvent(ev);
+      lastFullLoad = Date.now();
+      render();
+    } while (reloadQueued);
+    return true;
+  })().finally(() => { reloadPromise = null; liveEvents = null; });
+  return reloadPromise;
+}
+
+/* 实时同步：收到变化就直接合并那一行，不必每次都整表重拉 */
+let channel = null, renderTimer = null;
+function applyEvent(ev) {
+  if (ev.type === 'DELETE') { if (ev.old?.id) removeRow(ev.table, ev.old.id); }
+  else upsertRow(ev.table, ev.row);
+}
+function scheduleRender() {
+  if (renderTimer) return;
+  renderTimer = setTimeout(() => { renderTimer = null; render(); }, 60);
+}
+function subscribeRealtime() {
+  if (channel) return;
+  channel = sb.channel('mealcard-sync');
+  for (const t of Object.keys(TABLE_KEY)) {
+    channel.on('postgres_changes', { event: '*', schema: 'public', table: t }, p => {
+      const ev = { table: p.table, type: p.eventType, row: p.new, old: p.old };
+      if (liveEvents) liveEvents.push(ev);
+      applyEvent(ev);
+      scheduleRender();
+      pokeHistory();
+    });
+  }
+  channel.subscribe(status => {
+    const was = state.realtimeOk;
+    state.realtimeOk = status === 'SUBSCRIBED';
+    paintSyncDot();
+    // 每次（重新）连上都补拉一次：断线期间别人的操作不会自动补发过来
+    if (state.realtimeOk && !was && Date.now() - lastFullLoad > 1500) fullReload();
+  });
+}
+
+/* 兜底：手机锁屏再解锁、网络恢复、实时同步断了，都要自己把数据补回来 */
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && sb && state.user && $('main')) fullReload();
+});
+addEventListener('online', () => { if (sb && state.user) fullReload(); });
+let ticks = 0;
+setInterval(() => {
+  if (!sb || !state.user || !$('main') || document.visibilityState !== 'visible') return;
+  ticks++;
+  if (!state.realtimeOk) fullReload();              // 实时同步不通：每 30 秒兜底刷新
+  else if (ticks % 4 === 0) quickCheck();           // 实时同步正常：每 2 分钟轻量核对条数
+  if (state.tab === 'attend' && attAutoFor && attAutoFor !== todayStr()) render();   // 过了午夜：签到页换到新的一天
+}, 30000);
+async function quickCheck() {
+  try {
+    const tables = Object.keys(TABLE_KEY);
+    const res = await Promise.all(tables.map(t => sb.from(t).select('id', { count: 'exact', head: true })));
+    if (res.some(r => r.error)) return;
+    if (res.some((r, i) => r.count !== state[TABLE_KEY[tables[i]]].filter(x => !x._pending).length)) fullReload();
+  } catch {}
+}
+
+/* 网络抖动时自动重试：只重试「网络不通」和网关临时出错（502/503/504）这几类。
+   新增的记录 ID 是手机生成的，重发也不会记成两条，所以重试是安全的。 */
+/* 两台手机在同一瞬间改到同一个人（比如一台在删他、一台正给他打卡）时，数据库偶尔会判定两边「互相等」，
+   撤销其中一边的操作（死锁）。被撤销的那一边什么都没改，隔一下重做一次就行，不用让人看到报错 */
+const PG_RETRY = ['40P01', '40001'];     // deadlock_detected、serialization_failure
+const isTransient = e => isNetErr(e) || [502, 503, 504].includes(e?.status) || PG_RETRY.includes(e?.code);
+async function withRetry(fn, tries = 3) {
+  for (let i = 0; ; i++) {
+    try { return await fn(); }
+    catch (e) { if (!isTransient(e) || i >= tries - 1) throw e; await sleep([600, 1500][i] || 1500); }
+  }
+}
+/* 新增一行。ID 由手机生成，所以重发时如果发现"已经存在"，说明上一次其实成功了 */
+async function insertRow(table, row) {
+  let attempt = 0;
+  return withRetry(async () => {
+    attempt++;
+    try { return must(await sb.from(table).insert(row).select().single()); }
+    catch (e) {
+      // 重发时报错（「已存在」「卡已用满」等），可能是因为第一次其实已经存上了、只是回复丢了：
+      // 数据库里真有这一条，就算成功，不要误报失败
+      if (attempt > 1) {
+        const got = await sb.from(table).select('*').eq('id', row.id).maybeSingle();
+        if (!got.error && got.data) return got.data;
+      }
+      throw e;
+    }
+  });
+}
+/* 调用数据库里的函数：网络抖动时自动重发。函数本身按 ID 去重，重发不会记两次；
+   万一重发时报错，先看看第一次是不是其实已经存上了 */
+async function callWithRetry(fn, args, table, id) {
+  let attempt = 0;
+  return withRetry(async () => {
+    attempt++;
+    try { return must(await sb.rpc(fn, args)); }
+    catch (e) {
+      if (attempt > 1) {
+        const got = await sb.from(table).select('*').eq('id', id).maybeSingle();
+        if (!got.error && got.data) return got.data;
+      }
+      throw e;
+    }
+  });
+}
+const updateRow = (table, id, patch) => withRetry(async () => must(await sb.from(table).update(patch).eq('id', id).select().single()));
+const deleteRow = (table, id) => withRetry(async () => { must(await sb.from(table).delete().eq('id', id)); });
+
+/* 乐观写入：先本地改+重绘（手感零延迟），再发服务器；失败则回滚并说明原因 */
+async function optimistic(applyLocal, rollback, serverCall, { what = '保存失败', handled = null, resync = false } = {}) {
+  state.pendingOps++; writeSeq++;
+  applyLocal();
+  render();
+  try {
+    await serverCall();
+  } catch (e) {
+    // 另一台手机抢先一步造成的冲突（卡刚用满、人刚被删……）是预料之中的，已经用中文提示了，只记个警告
+    const conflict = /card_full|card_archived|card_replaced|card_not_found|member_not_found|member_has_active_card|already_used_today/.test(e.message) || ['PGRST116', '23503'].includes(e.code);
+    (conflict ? console.warn : console.error)(e);
+    rollback();
+    render();
+    if (!(handled && handled(e))) toast(friendly(e, what), 4200);
+    // 冲突，或者要求失败后重新核对的（签到）：回滚的是本机记得的旧样子，期间别的手机可能改过，拉一遍最新的
+    if (conflict || resync) fullReload();
+    return false;
+  } finally {
+    state.pendingOps--;
+  }
+  render();
+  return true;
+}
+
+/* ============================================================
+   派生数据（按版本号缓存索引，几千条记录也不卡）
+   ============================================================ */
+let _idx = null, _idxVer = -1;
+function index() {
+  if (_idx && _idxVer === dataVersion) return _idx;
+  const usagesByCard = new Map(), cardsByMember = new Map(), memberMap = new Map();
+  for (const m of state.members) memberMap.set(m.id, m);
+  for (const u of state.usages) { let a = usagesByCard.get(u.card_id); if (!a) usagesByCard.set(u.card_id, a = []); a.push(u); }
+  for (const c of state.cards) { let a = cardsByMember.get(c.member_id); if (!a) cardsByMember.set(c.member_id, a = []); a.push(c); }
+  for (const a of usagesByCard.values()) a.sort((x, y) => (x.used_date < y.used_date ? -1 : x.used_date > y.used_date ? 1 : toDate(x.created_at) - toDate(y.created_at)));
+  for (const a of cardsByMember.values()) a.sort((x, y) => toDate(y.created_at) - toDate(x.created_at));
+  // 签到：按日期 → 人。同一个人同一天只该有一条；万一本机「还在保存」的那条和服务器推来的那条同时在，以服务器的为准
+  const attByDate = new Map(), attByMember = new Map(), mealByDate = new Map();
+  for (const a of state.attendance) {
+    let d = attByDate.get(a.att_date); if (!d) attByDate.set(a.att_date, d = new Map());
+    const prev = d.get(a.member_id);
+    if (!prev || (prev._pending && !a._pending)
+        || (!prev._pending === !a._pending && String(a.updated_at || '') > String(prev.updated_at || ''))) d.set(a.member_id, a);
+  }
+  for (const d of attByDate.values()) for (const a of d.values()) {
+    let l = attByMember.get(a.member_id); if (!l) attByMember.set(a.member_id, l = []); l.push(a);
+  }
+  for (const l of attByMember.values()) l.sort((x, y) => (x.att_date < y.att_date ? 1 : -1));   // 新的在前
+  for (const u of state.usages) { let x = mealByDate.get(u.used_date); if (!x) mealByDate.set(u.used_date, x = new Set()); x.add(u.member_id); }
+  _idx = { usagesByCard, cardsByMember, memberMap, attByDate, attByMember, mealByDate }; _idxVer = dataVersion;
+  return _idx;
+}
+
+/* 名单一律按「小组 → 组内拼音/姓名」排，跟添加先后无关。
+   1组的人永远排在 2组前面，没分组的排最后。 */
+function compareMembers(a, b) {
+  const ra = groupRank(a), rb = groupRank(b);
+  if (ra !== rb) return ra - rb;
+  const ga = groupOf(a), gb = groupOf(b);
+  if (ga !== gb) return ga.localeCompare(gb, 'zh');   // 同级的非数字组名，按名称排
+  const pa = (a.pinyin || '').toLowerCase(), pbb = (b.pinyin || '').toLowerCase();
+  if (pa && pbb && pa !== pbb) return pa < pbb ? -1 : 1;
+  if (pa && !pbb) return -1;
+  if (!pa && pbb) return 1;
+  return (a.name || '').localeCompare(b.name || '', 'zh');
+}
+function activeMembers() {
+  return state.members.filter(m => m.active !== false).sort(compareMembers);
+}
+/* 小组的排序权重：1组=1 … 6组=6，非数字组名排在数字组之后，未分组永远最后 */
+function groupRank(m) {
+  const g = groupOf(m);
+  if (!g) return 9999;
+  const n = parseInt(g, 10);
+  return isNaN(n) ? 5000 : n;
+}
+const memberById = id => index().memberMap.get(id);
+function groupOf(m) { return (m && m.group_name) || ''; }
+
+/* 固定的 1~6 组。添加/导入/改组时直接点选，不用每次手打。 */
+const GROUP_PRESETS = ['1组', '2组', '3组', '4组', '5组', '6组'];
+
+/* 带数字的组名按数字排，"10组" 才不会排到 "2组" 前面 */
+function compareGroups(a, b) {
+  const na = parseInt(a, 10), nb = parseInt(b, 10);
+  if (!isNaN(na) && !isNaN(nb) && na !== nb) return na - nb;
+  return a.localeCompare(b, 'zh');
+}
+/* 现有的小组清单（名册里真的有人的那些） */
+function groupList() {
+  const set = new Set();
+  activeMembers().forEach(m => { if (groupOf(m)) set.add(groupOf(m)); });
+  return [...set].sort(compareGroups);
+}
+/* 点选器里要列出的组：1~6 组固定显示，另外补上名册里出现过的其它组名 */
+function groupChoices() {
+  const set = new Set(GROUP_PRESETS);
+  groupList().forEach(g => set.add(g));
+  return [...set].sort(compareGroups);
+}
+/* 一排可点的小组按钮，用在添加成员 / 批量导入 / 修改成员三处。
+   选中的值存在容器的 data-value 上，读的时候取它。 */
+function groupPickerHtml(selected) {
+  const chip = (val, label) =>
+    `<button type="button" class="group-chip${selected === val ? ' active' : ''}" data-pick="${esc(val)}">${esc(label)}</button>`;
+  return `<div class="group-bar group-picker" data-value="${esc(selected || '')}">
+    ${chip('', '未分组')}${groupChoices().map(g => chip(g, g)).join('')}
+  </div>`;
+}
+function bindGroupPicker(root) {
+  const bar = (root || document).querySelector('.group-picker');
+  if (!bar) return;
+  bar.addEventListener('click', e => {
+    const btn = e.target.closest('[data-pick]');
+    if (!btn) return;
+    bar.dataset.value = btn.dataset.pick;
+    bar.querySelectorAll('[data-pick]').forEach(b => b.classList.toggle('active', b === btn));
+  });
+}
+function readGroupPicker(root) {
+  const bar = (root || document).querySelector('.group-picker');
+  return bar ? (bar.dataset.value || '') : '';
+}
+/* 按当前选中的小组过滤。'' = 全部，'__none__' = 未分组 */
+function filterByGroup(list) {
+  if (!state.group) return list;
+  if (state.group === '__none__') return list.filter(m => !groupOf(m));
+  return list.filter(m => groupOf(m) === state.group);
+}
+const cardsOf = memberId => index().cardsByMember.get(memberId) || [];        // 新的在前
+function activeCardOf(memberId) { return cardsOf(memberId).find(c => c.status === 'ACTIVE') || null; }
+/* 当前这张卡：优先「使用中」的；没有就取最近一张没被作废的（已用完的也要显示，提醒催购新卡） */
+function currentCardOf(memberId) { return activeCardOf(memberId) || cardsOf(memberId).find(c => c.status !== 'ARCHIVED') || null; }
+const usagesOf = cardId => index().usagesByCard.get(cardId) || [];
+
+/* ---------- 签到的派生数据 ---------- */
+const NO_ATT = new Map();
+const attOn = date => index().attByDate.get(date) || NO_ATT;           // 这一天：人 → 记录
+const attOf = (memberId, date) => attOn(date).get(memberId) || null;
+const attHistory = memberId => index().attByMember.get(memberId) || [];  // 新的在前
+const ateOn = (memberId, date) => !!index().mealByDate.get(date)?.has(memberId);   // 这天用饭卡打过饭
+const ATT = {
+  present: { mark: '✓', word: '准时', cls: 'att-present' },
+  late:    { mark: '迟', word: '迟到', cls: 'att-late' },
+  absent:  { mark: '✗', word: '缺席', cls: 'att-absent' },
+};
+/* 几点以后签到算「迟」：几台手机共用数据库里的一份，默认 13:40 */
+function lateAfter() {
+  const v = state.settings.find(x => x.id === 'late_after')?.value;
+  return /^([01]\d|2[0-3]):[0-5]\d$/.test(v || '') ? v : '13:40';
+}
+/* 「✓ 13:32」「迟 13:45」「✗ 缺席」；补签时没填时间的：「✓ 到」「迟」 */
+function attText(a) {
+  if (!a) return '未签到';
+  if (a.status === 'absent') return '✗ 缺席';
+  const t = a.arrived_at ? ' ' + fmtTime(toDate(a.arrived_at)) : '';
+  return ATT[a.status].mark + (t || (a.status === 'present' ? ' 到' : ''));
+}
+/* 签到页只看周日（团契只在周日）。默认：今天是周日就看今天，不然看上一个周日。
+   每天第一次打开时自动选；手动翻到别的周日以后，当天不会被别的手机的操作带跑；
+   过了午夜自动回到默认——不会一直停在上周，把这周的签到补到上周去 */
+const latestSunday = t => weekdayOf(t) === 0 ? t : prevSunday(t);
+let attAutoFor = '';
+function attDate() {
+  const t = todayStr();
+  if (!state.attDate || attAutoFor !== t || state.attDate > t) { state.attDate = latestSunday(t); attAutoFor = t; }
+  return state.attDate;
+}
+/* 日期下拉框里的日子（新的在前）：最近半年的每个周日；有更早的记录就一直列到那一天；
+   以前在非周日记过的（比如特别聚会）那一天也列出来，免得那些记录看不到、改不了 */
+function attDateChoices(extra) {
+  const t = todayStr(), last = latestSunday(t);
+  const rec = [...index().attByDate.keys()].filter(d => d <= t);
+  let first = addDays(last, -7 * 25);
+  for (const d of rec) if (d < first) first = d;
+  const set = new Set(rec);
+  for (let d = last; d >= first; d = addDays(d, -7)) set.add(d);
+  if (extra && extra <= t) set.add(extra);
+  return [...set].sort().reverse();
+}
+/* 「今天」「上周日」「3 周前」 */
+function attAgo(d) {
+  const t = todayStr();
+  if (d === t) return '今天';
+  const mon = s => addDays(s, -((weekdayOf(s) + 6) % 7));       // 那一周的周一
+  const w = Math.round((Date.parse(mon(t) + 'T12:00:00Z') - Date.parse(mon(d) + 'T12:00:00Z')) / (7 * 864e5));
+  if (w <= 0) return '这周';
+  if (w === 1) return weekdayOf(d) === 0 ? '上周日' : '上周';
+  return `${w} 周前`;
+}
+/* 这一天有没有聚会：有人签到（准时或迟到）就算有。放假没聚会的周日，不会把所有人都算成缺席；
+   以前版本记下的零星「缺席」也不算聚会 */
+function hadMeeting(d) { for (const a of attOn(d).values()) if (a.status !== 'absent') return true; return false; }
+const meetingDates = (from = '0000-01-01', to = '9999-12-31') => { const t = todayStr();
+  return [...index().attByDate.keys()].filter(d => d >= from && d <= to && d <= t && hadMeeting(d)).sort(); };
+/* 名单、统计、导出用的状态：记了什么就是什么；周日过去以后，没签到的人自动算缺席。
+   不算缺席的：今天（还没过完）、那天根本没人签到（没聚会）、那天才加进名册或者那时还没加的
+   （当天在打饭台新加的人多半来了，只是没签到）、已经隐藏（离开）以后的、不是周日的 */
+const joinedOn = m => (m && m.created_at) ? fmtDate(toDate(m.created_at)) : '0000-01-01';
+function attStatusFor(m, date) {
+  const a = attOf(m.id, date);
+  if (a) return a.status;
+  if (weekdayOf(date) !== 0 || date >= todayStr() || date <= joinedOn(m) || !hadMeeting(date)) return null;
+  if (m.active === false) { const last = attHistory(m.id)[0]?.att_date; if (!last || date > last) return null; }
+  return 'absent';
+}
+/* 巴塞罗那当地「某天几点」是哪个时刻（夏令时也对）：补签时手机先按这个显示，数据库也是这样换算的 */
+function madridIso(date, hm) {
+  const want = Date.parse(`${date}T${hm}:00Z`);
+  const wall = ts => { const p = madridParts(new Date(ts)); return Date.parse(`${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}:00Z`); };
+  let ts = want - (wall(want) - want);
+  ts += want - wall(ts);
+  return new Date(ts).toISOString();
+}
+/* 「半年」跟纸质签到表一样：8 月到第二年 1 月、2 月到 7 月 */
+function halfOf(s) {
+  const y = +s.slice(0, 4), mo = +s.slice(5, 7);
+  if (mo >= 8) return { from: `${y}-08-01`, to: `${y + 1}-01-31` };
+  if (mo === 1) return { from: `${y - 1}-08-01`, to: `${y}-01-31` };
+  return { from: `${y}-02-01`, to: `${y}-07-31` };
+}
+const halfLabel = h => `${h.from.slice(0, 4)}年${+h.from.slice(5, 7)}月–${h.to.slice(0, 4) !== h.from.slice(0, 4) ? h.to.slice(0, 4) + '年' : ''}${+h.to.slice(5, 7)}月`;
+
+/* ============================================================
+   修改记录：谁、什么时候、改了什么。
+   数据库每改一条就自动记一笔（网页只能看、改不了也删不掉）；这里把它翻译成人话。
+   同一次操作（比如删人连带删卡、补签改日期）在数据库里是同一个「事务号」，合成一条显示
+   ============================================================ */
+const logNames = new Map();                      // 记录里见过的人名（人删了以后也能显示名字）；同一个人以最新的一条为准
+function noteLogNames(es) {
+  for (const e of es) if (e.tbl === 'members') {
+    const d = e.new_data || e.old_data, cur = logNames.get(e.member_id);
+    if (d?.name && (!cur || e.id > cur.id)) logNames.set(e.member_id, { id: e.id, name: d.name });
+  }
+}
+const logName = id => memberById(id)?.name || logNames.get(id)?.name || '（已删除的人）';
+/* 显示用的「谁」：共用账号写清楚是共用的 */
+const actorLabel = e => (e.actor_email && e.actor_email.toLowerCase() === SHARED_ACCOUNT) ? 'admin（共用账号）' : (e.actor || '？');
+const actorKey = e => (e.actor_email || '').toLowerCase() || '@' + (e.actor || '');
+async function fetchLog({ before = null, after = null, member = null, limit = 150 } = {}) {
+  const rows = await withRetry(async () => {
+    let qy = sb.from('change_log').select('*').order('id', { ascending: after === null ? false : true }).limit(limit);
+    if (before) qy = qy.lt('id', before);
+    if (after !== null) qy = qy.gt('id', after);
+    if (member) qy = qy.eq('member_id', member);
+    return must(await qy) || [];
+  });
+  noteLogNames(rows);
+  return rows;
+}
+/* 按「同一次操作」分组，新的在前；每组翻译成一两句话（翻译不出来的组不显示，比如只是卡的状态跟着次数变了） */
+function groupLog(rows) {
+  const by = new Map();
+  for (const e of rows) { let g = by.get(e.tx); if (!g) by.set(e.tx, g = []); g.push(e); }
+  const out = [];
+  for (const es of by.values()) {
+    es.sort((a, b) => a.id - b.id);
+    const lines = describeTx(es);
+    if (lines.length) out.push({ id: es[es.length - 1].id, at: es[0].at, who: actorLabel(es[0]), key: actorKey(es[0]), email: es[0].actor_email || '', lines });
+  }
+  return out.sort((a, b) => b.id - a.id);
+}
+const TBL_CN = { members: '名册', meal_cards: '饭卡', card_usages: '打卡', cash_logs: '散客', expenses: '支出', attendance: '签到', app_settings: '设置' };
+const CARD_ST = { ACTIVE: '使用中', EXHAUSTED: '已用完', ARCHIVED: '已作废' };
+function describeTx(es) {
+  const out = [], used = new Set(), odd = [];       // odd：认得是哪一条、但说不清改了什么的，最后统一写一句（绝不悄悄漏掉）
+  const take = pred => es.filter(e => !used.has(e) && pred(e)).map(e => (used.add(e), e));
+  const cardStatusChange = (x, cardId) => x.tbl === 'meal_cards' && x.op === 'UPDATE' && x.row_id === cardId && x.new_data?.status !== x.old_data?.status
+    && x.new_data?.member_id === x.old_data?.member_id && x.new_data?.is_paid === x.old_data?.is_paid;
+  // 人：加入、改名、换组、隐藏、恢复、删除（连同他的卡、打饭、签到）
+  for (const e of take(x => x.tbl === 'members')) {
+    const o = e.old_data || {}, n = e.new_data || {};
+    if (e.op === 'DELETE') {
+      const kids = take(x => x.member_id === e.member_id && x.op === 'DELETE');
+      take(x => x.member_id === e.member_id && x.tbl === 'meal_cards');
+      const cnt = t => kids.filter(x => x.tbl === t).length;
+      const parts = [cnt('meal_cards') && `${cnt('meal_cards')} 张饭卡`, cnt('card_usages') && `${cnt('card_usages')} 次打饭`, cnt('attendance') && `${cnt('attendance')} 次签到`].filter(Boolean);
+      out.push(`删除 ${o.name}${parts.length ? `（连同 ${parts.join('、')}）` : ''}`);
+    } else if (e.op === 'INSERT') {
+      out.push(`加入名册：${n.name}${n.group_name ? `（${n.group_name}）` : ''}`);
+    } else {
+      const bits = [];
+      if (o.name !== n.name) bits.push(`改名：${o.name} → ${n.name}`);
+      if ((o.group_name || '') !== (n.group_name || '')) bits.push(`${n.name} 换组：${o.group_name || '未分组'} → ${n.group_name || '未分组'}`);
+      if (o.active !== n.active) bits.push(n.active === false ? `隐藏 ${n.name}` : `恢复 ${n.name}`);
+      if (!bits.length && (o.pinyin || '') !== (n.pinyin || '')) bits.push(`${n.name} 改拼音：${o.pinyin || '（空）'} → ${n.pinyin || '（空）'}`);
+      if (bits.length) out.push(bits.join('；')); else odd.push(e);
+    }
+  }
+  // 打卡、撤销打卡（卡的状态跟着变的那一笔并进来）
+  for (const e of take(x => x.tbl === 'card_usages')) {
+    const o = e.old_data || {}, n = e.new_data || {}, d = e.op === 'DELETE' ? o : n;
+    const st = take(x => cardStatusChange(x, d.card_id) || (e.op === 'UPDATE' && cardStatusChange(x, o.card_id)));
+    if (e.op === 'INSERT') out.push(`打卡：${logName(e.member_id)}${st.some(x => x.new_data?.status === 'EXHAUSTED') ? '（5 次用完了）' : ''}`);
+    else if (e.op === 'DELETE') out.push(`撤销打卡：${logName(e.member_id)}（${fmtShort(o.used_date)} 那次）`);
+    else {
+      const bits = [];
+      if (o.used_date !== n.used_date) bits.push(`日期 ${fmtShort(o.used_date)} → ${fmtShort(n.used_date)}`);
+      if (o.member_id !== n.member_id) bits.push(`从 ${logName(o.member_id)} 改到 ${logName(n.member_id)}`);
+      else if (o.card_id !== n.card_id) bits.push('换到另一张卡上');
+      out.push(`改了 ${logName(o.member_id)} 的一次打卡${bits.length ? `（${bits.join('，')}）` : ''}`);
+    }
+  }
+  // 开卡（同时作废旧卡的并进来）、收钱、改回未付、作废、删卡、转给别人
+  for (const e of take(x => x.tbl === 'meal_cards' && x.op === 'INSERT')) {
+    const arch = take(x => x.tbl === 'meal_cards' && x.op === 'UPDATE' && x.member_id === e.member_id && x.new_data?.status === 'ARCHIVED' && x.old_data?.status !== 'ARCHIVED');
+    out.push(`给 ${logName(e.member_id)} 开卡（${e.new_data?.is_paid ? '已收 20 欧' : '暂未收款'}${arch.length ? '，作废旧卡' : ''}）`);
+  }
+  for (const e of take(x => x.tbl === 'meal_cards')) {
+    const o = e.old_data || {}, n = e.new_data || {};
+    if (e.op === 'DELETE') { out.push(`删除 ${logName(o.member_id)} 的一张饭卡`); continue; }
+    const bits = [];
+    if (o.is_paid !== n.is_paid) bits.push(n.is_paid ? '收到 20 欧' : '改回未付');
+    if (o.status !== n.status && !(n.status === 'ARCHIVED')) bits.push(`${CARD_ST[o.status] || o.status} → ${CARD_ST[n.status] || n.status}`);
+    if (o.member_id !== n.member_id) out.push(`饭卡从 ${logName(o.member_id)} 转给了 ${logName(n.member_id)}${bits.length ? `（${bits.join('，')}）` : ''}`);
+    else if (n.status === 'ARCHIVED' && o.status !== 'ARCHIVED') out.push(`作废 ${logName(n.member_id)} 的旧卡${bits.length ? `（${bits.join('，')}）` : ''}`);
+    else if (bits.length) out.push(`${logName(n.member_id)} 的饭卡：${bits.join('，')}`);
+    else odd.push(e);
+  }
+  // 签到：签到、补签、改签到、改日期、撤销
+  const atts = take(x => x.tbl === 'attendance'), byMem = new Map();
+  for (const e of atts) { let l = byMem.get(e.member_id); if (!l) byMem.set(e.member_id, l = []); l.push(e); }
+  for (const [mid, list] of byMem) {
+    const del = list.find(e => e.op === 'DELETE'), up = list.find(e => e.op !== 'DELETE'), who = logName(mid);
+    for (const e of list) if (e !== del && e !== up) odd.push(e);
+    if (up && del && del.old_data.att_date !== up.new_data.att_date) {
+      out.push(`签到改到 ${fmtCn(up.new_data.att_date)}：${who} ${attText(up.new_data)}（原来记在 ${fmtCn(del.old_data.att_date)}）`);
+    } else if (up && up.op === 'INSERT') {
+      const d = up.new_data.att_date, same = d === fmtDate(toDate(up.at));
+      out.push(`${same ? '签到' : '补签'}：${who}${same ? '' : ' ' + fmtCn(d)} ${attText(up.new_data)}`);
+      if (del) odd.push(del);
+    } else if (up) {
+      const o = up.old_data, n = up.new_data;
+      if (o.member_id !== n.member_id) odd.push(up);
+      else if (o.att_date !== n.att_date) out.push(`签到改到 ${fmtCn(n.att_date)}：${who} ${attText(n)}（原来记在 ${fmtCn(o.att_date)}）`);
+      else if (o.status !== n.status || String(o.arrived_at || '') !== String(n.arrived_at || '')) out.push(`改签到：${who} ${fmtCn(n.att_date)} ${attText(o)} → ${attText(n)}`);
+      // 其余：只是重新存了一遍（内容没变），不用写
+      if (del) odd.push(del);
+    } else if (del) {
+      out.push(`撤销签到：${who} ${fmtCn(del.old_data.att_date)}（原来是 ${attText(del.old_data)}）`);
+    }
+  }
+  for (const e of take(x => x.tbl === 'cash_logs')) {
+    const d = e.new_data || e.old_data || {};
+    out.push(e.op === 'DELETE' ? `删除一笔散客 ${eur(d.amount)}（${fmtShort(d.log_date)} 记的）` : e.op === 'INSERT' ? `记一笔散客 ${eur(d.amount)}` : '改了一笔散客记录');
+  }
+  for (const e of take(x => x.tbl === 'expenses')) {
+    const d = e.new_data || e.old_data || {}, what = `${eur(d.amount)} ${d.purpose || ''}`.trim();
+    out.push(e.op === 'DELETE' ? `删除支出：${what}` : e.op === 'INSERT' ? `记支出：${what}${d.handler ? `（经手：${d.handler}）` : ''}` : `改支出：${what}`);
+  }
+  for (const e of take(x => x.tbl === 'app_settings')) {
+    if (e.row_id === 'late_after' && e.new_data?.value !== e.old_data?.value) out.push(`改「几点以后算迟」：${e.old_data?.value || '13:40'} → ${e.new_data?.value || ''}`);
+    else odd.push(e);
+  }
+  // 上面都没认出来的（比如有人绕过网页直接改了数据）：也要写一句，不能悄悄漏掉
+  const rest = es.filter(e => !used.has(e)).concat(odd), cnt = new Map();
+  for (const e of rest) { const k = `${e.tbl}|${e.op}|${e.member_id || ''}`; cnt.set(k, (cnt.get(k) || 0) + 1); }
+  for (const [k, n] of cnt) {
+    const [tbl, op, mid] = k.split('|');
+    const verb = op === 'INSERT' ? '新加了' : op === 'DELETE' ? '删除了' : '改了';
+    out.push(`${verb}${n > 1 ? ` ${n} 条` : '一条'}${TBL_CN[tbl] || tbl}记录${mid ? `（${logName(mid)}）` : ''}`);
+  }
+  return out;
+}
+/* 一条一条画出来，按天分节 */
+function logItemsHtml(groups, { showWho = true } = {}) {
+  let html = '', lastDay = '';
+  for (const g of groups) {
+    const d = fmtDate(toDate(g.at));
+    if (d !== lastDay) { lastDay = d; html += `<div class="hist-day">${esc(fmtCn(d))}${d === todayStr() ? '（今天）' : ''}</div>`; }
+    html += `<div class="hist-item"><div class="hist-head"><span class="hist-time">${esc(fmtTime(toDate(g.at)))}</span>${showWho ? `<span class="hist-who">${esc(g.who)}</span>` : ''}</div>
+      ${g.lines.map(l => `<div class="hist-text">${esc(l)}</div>`).join('')}</div>`;
+  }
+  return html;
+}
+
+/* 顶上「记录」：全部的修改记录。开着的时候，别的手机一改，这里几秒内也跟着出现 */
+let histUI = null;
+function openHistory() {
+  const st = { rows: [], ids: new Set(), done: false, actor: '', busy: false, refreshing: false, again: false };
+  const ref = showModal({
+    title: '修改记录',
+    bodyHtml: `<div class="stat-note hist-note">谁、什么时候、改了什么，都是数据库自动记的，谁都改不了、删不掉。</div>
+      <div id="histActors"></div><div id="histList"><div class="list-meta">加载中…</div></div>
+      <button type="button" class="add-btn" id="histMore" hidden>加载更早的</button>
+      <button type="button" class="export-btn" id="histExport">导出修改记录 (CSV)</button>`,
+    buttons: [{ label: '关闭', variant: 'btn-ghost', onClick: c => c() }]
+  });
+  const card = ref.card, pick = s => card.querySelector(s);
+  const paint = () => {
+    const groups = groupLog(st.rows);
+    // 按登录账号分人：名字是各人自己填的（可能重名、可能改过），账号是管理员建的，不会混
+    const actors = new Map();
+    for (const g of groups) if (!actors.has(g.key)) actors.set(g.key, g.who);        // 新的在前：显示最近用的名字
+    if (st.actor && !actors.has(st.actor)) st.actor = '';
+    pick('#histActors').className = actors.size > 1 ? 'group-bar hist-actors' : '';
+    pick('#histActors').innerHTML = actors.size > 1 ? [['', '全部'], ...actors].map(([v, l]) =>
+      `<button type="button" class="group-chip${st.actor === v ? ' active' : ''}" data-actor="${esc(v)}">${esc(l)}</button>`).join('') : '';
+    const shown = st.actor ? groups.filter(g => g.key === st.actor) : groups;
+    pick('#histList').innerHTML = shown.length ? logItemsHtml(shown) : `<div class="empty-state">${st.rows.length ? '这个人还没有改过什么' : '还没有修改记录'}</div>`;
+    pick('#histMore').hidden = st.done;
+  };
+  // 新读到的并进来：同一条只留一份（两次刷新撞在一起也不会重复）
+  const add = rows => { let n = 0; for (const r of rows) if (!st.ids.has(r.id)) { st.ids.add(r.id); st.rows.push(r); n++; } if (n) st.rows.sort((a, b) => b.id - a.id); return n; };
+  const load = async more => {
+    if (st.busy) return; st.busy = true;
+    try {
+      const rows = await fetchLog({ before: more && st.rows.length ? st.rows[st.rows.length - 1].id : null });
+      add(rows);
+      st.done = rows.length < 150;
+      paint();
+    } catch (e) {
+      if (st.rows.length) toast(friendly(e, '没读到修改记录'), 3600);
+      else pick('#histList').innerHTML = `<div class="empty-state">${esc(friendly(e, '没读到修改记录'))}</div>`;
+    } finally {
+      st.busy = false;
+      if (st.again) { st.again = false; pokeHistory(); }
+    }
+  };
+  pick('#histActors').addEventListener('click', e => { const b = e.target.closest('[data-actor]'); if (b) { st.actor = b.dataset.actor; paint(); } });
+  pick('#histMore').addEventListener('click', () => load(true));
+  pick('#histExport').addEventListener('click', e => exportHistoryClick(e.currentTarget));
+  histUI = {
+    card,
+    refresh: async () => {
+      if (st.busy || st.refreshing) { st.again = true; return; }
+      if (!st.rows.length) return load(false);                 // 打开时还是空的（比如刚升级完）：整个重读
+      st.refreshing = true;
+      try {
+        // 从手上最新的那条往回多看 50 条：先开始、后完成的那笔操作（编号小一点、晚一点才出现）也补得上
+        let after = Math.max(0, st.rows[0].id - 50), n = 0;
+        for (let i = 0; i < 20; i++) {
+          const rows = await fetchLog({ after, limit: 500 });
+          n += add(rows);
+          if (rows.length < 500) break;
+          after = rows[rows.length - 1].id;
+        }
+        if (n && card.isConnected) paint();
+      } catch {}
+      finally {
+        st.refreshing = false;
+        if (st.again) { st.again = false; pokeHistory(); }
+      }
+    }
+  };
+  load(false);
+}
+let histTimer = null;
+function pokeHistory() {
+  if (!histUI || !histUI.card.isConnected) { histUI = null; return; }
+  clearTimeout(histTimer);
+  histTimer = setTimeout(() => histUI && histUI.card.isConnected && histUI.refresh(), 700);
+}
+
+/* 名册里点开一个人：他的修改记录（最近 12 次操作） */
+async function loadMemberHistory(memberId, el) {
+  try {
+    const groups = groupLog(await fetchLog({ member: memberId, limit: 80 })).slice(0, 12);
+    if (el.isConnected) el.innerHTML = groups.length ? logItemsHtml(groups) : '<div class="list-meta">还没有修改记录（升级到第 8 版以后的改动才有）</div>';
+  } catch (e) { if (el.isConnected) el.innerHTML = `<div class="list-meta">${esc(friendly(e, '没读到修改记录'))}</div>`; }
+}
+
+/* 导出修改记录：全部，一次操作一行 */
+async function buildHistoryCsv() {
+  let all = [], before = null;
+  for (;;) {
+    const rows = await fetchLog({ before, limit: 1000 });
+    all = all.concat(rows);
+    if (rows.length < 1000) break;
+    before = rows[rows.length - 1].id;
+  }
+  const groups = groupLog(all).reverse();                       // 表里从早到晚
+  const fmtAt = s => { const d = toDate(s); return `${fmtDate(d).replace(/-/g, '/')} ${fmtTime(d)}`; };
+  const head = ['时间', '谁', '登录账号', '做了什么'];
+  const body = groups.map(g => [fmtAt(g.at), g.who, g.email, g.lines.join('；')]);
+  const csv = '﻿' + [['繁星团契修改记录', '', '', ''], head, ...body].map(r => r.map(csvCell).join(',')).join('\r\n');
+  return { name: `changelog_${todayStr()}.csv`, csv, msg: `已导出 ${body.length} 条修改记录`, count: body.length };
+}
+/* iPhone 上，分享面板 / 下载只能在「点一下」的那一刻打开；读全部记录要一点时间，
+   所以 iPhone 上分两下：先准备好，按钮变成「准备好了，点这里保存」，再点一下才保存 */
+async function exportHistoryClick(btn) {
+  const LABEL = '导出修改记录 (CSV)';
+  if (btn._ready) { const r = btn._ready; btn._ready = null; btn.textContent = LABEL; saveCsv(r.name, r.csv, r.msg); return; }
+  if (btn.disabled) return;
+  btn.disabled = true; btn.textContent = '正在准备…';
+  let r = null;
+  try { r = await buildHistoryCsv(); } catch (e) { toast(friendly(e, '导出失败'), 4200); }
+  btn.disabled = false; btn.textContent = LABEL;
+  if (!r || !btn.isConnected) return;
+  if (platformInfo().ios) { btn._ready = r; btn.textContent = `准备好了（${r.count} 条），点这里保存`; return; }
+  saveCsv(r.name, r.csv, r.msg);
+}
+
+/* ---------- 自己的账号：名字 ----------
+   小组长各用自己的账号登录；名字写进登录信息里，数据库按它记「谁做的」。共用账号不问名字（大家共用，记成 admin） */
+const myUser = () => String(state.user?.email || '').split('@')[0].slice(0, 30);
+const myName = () => String(state.user?.user_metadata?.name || '').trim();
+/* 记录上写的「谁」：和数据库记的一模一样——填了名字的写「名字（账号）」，没填的写账号。
+   名字是各人自己填的，后面带上管理员建的账号，谁也冒充不了谁 */
+const myActor = () => { const u = myUser(), n = myName(); return !u ? '' : (!n || n === u) ? u : `${n.slice(0, 20)}（${u}）`; };
+const whoAmI = () => isShared() ? '共用账号' : (myName() || myUser());
+function askMyName(force = false) {
+  if (!state.user || isShared()) return;
+  const cur = (state.user.user_metadata?.name || '').trim();
+  if (cur && !force) return;
+  showModal({
+    title: force ? '改名字' : '你叫什么名字？',
+    bodyHtml: `${force ? '' : '第一次用自己的账号登录，填一下名字。<br>'}<div class="field-label">名字（比如：李明）。「修改记录」和各条记录上会写成「名字（${esc(myUser())}）」，后面是你的账号</div>
+      <input id="myName" type="text" maxlength="20" value="${esc(cur)}" autocomplete="off" enterkeyhint="done">`,
+    buttons: [
+      { label: force ? '取消' : '以后再说', variant: 'btn-ghost', onClick: c => c() },
+      { label: '保存', variant: 'btn-primary', onClick: c => { const v = $('myName').value.trim(); if (!v) { toast('请填一个名字'); return; } c(); saveMyName(v); } }
+    ]
+  });
+  setTimeout(() => $('myName')?.focus(), 60);
+}
+async function saveMyName(v) {
+  try {
+    const up = await sb.auth.updateUser({ data: { name: v } });
+    if (up.error) throw up.error;
+    const rs = await sb.auth.refreshSession();                 // 新名字要进登录凭证，数据库才认得
+    if (rs.error) throw rs.error;
+    state.user = rs.data?.user || up.data?.user || state.user;
+    render();
+    toast(`好的，以后记成「${myActor()}」`);
+  } catch (e) { toast(friendly(e, '名字没存上'), 4200); }
+}
+
+/* ---------- 拼音首字母（名单导入和单个添加都自动生成；取不到也不影响使用）---------- */
+let _pinyinMod = null;
+async function pinyinOf(name) {
+  if (!/[一-龥]/.test(name)) return '';
+  try {
+    _pinyinMod = _pinyinMod || await import('https://cdn.jsdelivr.net/npm/pinyin-pro@3.19.6/+esm');
+    return _pinyinMod.pinyin(name, { pattern: 'first', toneType: 'none', type: 'array' }).join('').replace(/[^a-z]/gi, '').toLowerCase();
+  } catch { return ''; }
+}
+
+/* ============================================================
+   动作
+   ============================================================ */
+/* 一张卡可以一天用好几次（本人同意让别人用），所以同日重复不再拦截，
+   只在第二次起弹确认，挡住手滑点错的情况。 */
+function punch(cardId, memberId) {
+  const sameDay = usagesOf(cardId).filter(u => u.used_date === todayStr()).length;
+  if (sameDay > 0) return askRepeat(cardId, memberId);
+  doPunch(cardId, memberId, false);
+}
+
+/* 这张卡今天已经用过：确认后才再扣一次（帮别人打饭的情况） */
+function askRepeat(cardId, memberId, maybeOtherPhone = false) {
+  const m = memberById(memberId);
+  const n = Math.max(1, usagesOf(cardId).filter(u => u.used_date === todayStr()).length);
+  showModal({
+    title: '这张卡今天已经用过了',
+    bodyHtml: `${esc(m?.name || '')} 的卡今天已经用了 <strong>${n}</strong> 次${maybeOtherPhone ? '（可能是另一台手机刚打的）' : ''}。<br><br>如果是帮别人打饭，点「再用一次」；如果是刚才点错了，点取消。`,
+    buttons: [
+      { label: '取消', variant: 'btn-ghost', onClick: close => close() },
+      { label: '再用一次', variant: 'btn-primary', onClick: close => { close(); doPunch(cardId, memberId, true); } }
+    ]
+  });
+}
+
+/* repeat = 已经有人确认过「今天再用一次」。
+   没确认的情况下，数据库发现这张卡今天已经用过（比如另一台手机同一秒刚打过），会拦下来，
+   这边就弹确认框，而不是悄悄多扣一次。 */
+async function doPunch(cardId, memberId, repeat = false) {
+  const card = state.cards.find(c => c.id === cardId);
+  if (!card) return;
+  const row = { id: uuid(), card_id: cardId, member_id: memberId, used_date: todayStr(), created_at: new Date().toISOString(), created_by: myActor(), _pending: true };
+  const willExhaust = usagesOf(cardId).length + 1 >= 5;
+  const prevStatus = card.status;
+  let usedToday = false;
+  // 只发一个请求：卡的「已用完」状态由数据库自动维护，不会出现半截成功
+  const ok = await optimistic(
+    () => { upsertRow('card_usages', row); if (willExhaust) patchRow('meal_cards', cardId, { status: 'EXHAUSTED' }); },
+    () => { removeRow('card_usages', row.id); patchRow('meal_cards', cardId, { status: prevStatus }); },
+    async () => upsertRow('card_usages', await callWithRetry('mealcard_punch', { p_id: row.id, p_card: cardId, p_repeat: repeat }, 'card_usages', row.id)),
+    { handled: e => (usedToday = /already_used_today/.test(e?.message || '')) }
+  );
+  if (usedToday) { askRepeat(cardId, memberId, true); return; }
+  if (ok && willExhaust) {
+    vibrate(200);
+    toast('该卡已用完，请提醒TA下次购卡！', 3600);
+  }
+}
+
+async function revokeUsage(usage) {
+  const card = state.cards.find(c => c.id === usage.card_id);
+  const prevStatus = card ? card.status : null;
+  const backup = { ...usage }; delete backup._pending;
+  // 跟数据库的规则一致：这个人如果已经有别的使用中的卡，旧卡撤销一次后仍算「已用完」
+  const otherActive = !!card && state.cards.some(c => c.member_id === card.member_id && c.status === 'ACTIVE' && c.id !== card.id);
+  // 走数据库里的函数：另一台手机刚给这个人换了新卡时，它会拦下来（旧卡上的记录不能再撤销）
+  await optimistic(
+    () => { removeRow('card_usages', usage.id); if (card && prevStatus === 'EXHAUSTED' && !otherActive) patchRow('meal_cards', card.id, { status: 'ACTIVE' }); },
+    () => { upsertRow('card_usages', backup); if (card) patchRow('meal_cards', card.id, { status: prevStatus }); },
+    () => withRetry(async () => { must(await sb.rpc('mealcard_revoke', { p_id: usage.id })); })
+  );
+}
+
+async function setPaid(cardId, paid) {
+  const card = state.cards.find(c => c.id === cardId);
+  if (!card) return;
+  const before = { is_paid: card.is_paid, paid_at: card.paid_at ?? null };
+  const ok = await optimistic(
+    () => patchRow('meal_cards', cardId, { is_paid: paid, paid_at: paid ? new Date().toISOString() : null }),
+    () => patchRow('meal_cards', cardId, before),
+    async () => upsertRow('meal_cards', await updateRow('meal_cards', cardId, { is_paid: paid }))
+  );
+  if (ok) toast(paid ? '已标记为收款' : '已改回未付款');
+}
+
+/* allowDup = 已经确认过「就是要再加一个同名的」。
+   没确认时，数据库发现已经有这个名字（比如另一台手机同一秒刚加过），会拦下来，这边就问一下。 */
+async function addMember(name, pinyin, groupName, allowDup = false, after = null) {
+  if (!pinyin) pinyin = await pinyinOf(name);
+  const id = uuid();
+  state.pendingOps++; writeSeq++;
+  try {
+    const saved = await callWithRetry('mealcard_add_member',
+      { p_id: id, p_name: name, p_pinyin: pinyin || '', p_group: groupName || '', p_allow_dup: allowDup }, 'members', id);
+    upsertRow('members', saved);
+    render();
+    toast('已添加 ' + name);
+    if (after) after(saved);
+  } catch (e) {
+    if (/member_name_exists/.test(e?.message || '')) {
+      // 把数据库里同名的人拿过来（可能是另一台手机刚加的），再问清楚
+      try { const res = await sb.from('members').select('*').eq('name', name); for (const x of res.data || []) upsertRow('members', x); } catch {}
+      render();
+      if (!askSameName(name, pinyin, groupName, after)) toast('名册里已经有「' + name + '」了', 4200);
+    } else {
+      toast(friendly(e, '添加失败'), 4200);
+    }
+  } finally { state.pendingOps--; }
+}
+
+/* 名册里已经有同名的人：先问清楚是再加一个同名的，还是恢复原来那个。问了就返回 true。
+   after：加好（或恢复好）以后接着做的事——签到页加新朋友时是「马上签到」 */
+function askSameName(name, py, grp, after = null) {
+  const same = state.members.filter(m => m.name === name);
+  const visible = same.find(m => m.active !== false);
+  const hidden = same.find(m => m.active === false);
+  if (visible) {
+    const buttons = [{ label: '不加了', variant: 'btn-ghost', onClick: c => c() },
+                     { label: '仍然添加', variant: 'btn-secondary', onClick: c => { c(); addMember(name, py, grp, true, after); } }];
+    const verb = after?.verb || '签到';
+    if (after) buttons.push({ label: `就是他，直接${verb}`, variant: 'btn-primary', onClick: c => { c(); after(visible); } });
+    showModal({
+      title: `名册里已经有「${name}」了`,
+      bodyHtml: `已有的这位在 <strong>${esc(groupOf(visible) || '未分组')}</strong>。${after ? `如果就是这个人，直接给他${verb}；` : ''}确定要再加一个同名的吗？打饭台上会出现两个「${esc(name)}」。`,
+      buttons
+    });
+    return true;
+  }
+  if (hidden) {
+    showModal({
+      title: `「${name}」之前被隐藏了`,
+      bodyHtml: `恢复原来的记录，他以前的饭卡、打卡和签到历史都还在。`,
+      buttons: [
+        { label: '另建一个新的', variant: 'btn-ghost', onClick: c => { c(); addMember(name, py, grp, true, after); } },
+        { label: '恢复原来的', variant: 'btn-primary', onClick: async c => {
+            c();
+            const ok = await updateMember(hidden.id, { active: true, ...(grp ? { group_name: grp } : {}) }, after ? '' : '已恢复 ' + name);
+            if (ok && after) after(memberById(hidden.id));
+          } }
+      ]
+    });
+    return true;
+  }
+  return false;
+}
+
+/* 删除一个人之前先说清楚后果。
+   没有任何饭卡、打饭记录的（比如刚加错的名字）：确认一下就删。
+   有记录的：他的饭卡和打饭记录会一起删掉，账目也会跟着变——建议改用「隐藏」。 */
+function askDeleteMember(memberId) {
+  const m = memberById(memberId);
+  if (!m) return;
+  const cards = cardsOf(memberId);
+  const nUse = cards.reduce((s, c) => s + usagesOf(c.id).length, 0);
+  const paidCards = cards.filter(c => c.is_paid).length;
+  const nAtt = attHistory(memberId).length;
+  if (!cards.length && !nAtt) {
+    showModal({
+      title: `删除「${m.name}」？`,
+      bodyHtml: `${esc(m.name)} 还没有任何饭卡、打饭和签到记录，删掉不影响任何账目。<br>删除后不能恢复。`,
+      buttons: [
+        { label: '取消', variant: 'btn-ghost', onClick: c => c() },
+        { label: '删除', variant: 'btn-danger', onClick: c => { c(); deleteMember(memberId); } }
+      ]
+    });
+    return;
+  }
+  const buttons = [{ label: '取消', variant: 'btn-ghost', onClick: c => c() }];
+  if (m.active !== false) buttons.push({ label: '改为隐藏', variant: 'btn-secondary', onClick: c => { c(); updateMember(memberId, { active: false }, `已隐藏 ${m.name}（名册最下面可以恢复）`); } });
+  buttons.push({ label: '仍然删除', variant: 'btn-danger', onClick: c => { c(); deleteMember(memberId); } });
+  const what = [cards.length ? `<strong>${cards.length}</strong> 张饭卡、<strong>${nUse}</strong> 次打饭记录` : '',
+                nAtt ? `<strong>${nAtt}</strong> 条签到记录` : ''].filter(Boolean).join('、');
+  showModal({
+    title: `「${m.name}」有${cards.length ? '饭卡和打饭记录' : ''}${cards.length && nAtt ? '、' : ''}${nAtt ? '签到记录' : ''}`,
+    bodyHtml: `彻底删除会把 ${esc(m.name)} 的 ${what}一起删掉${paidCards ? `（其中 ${paidCards} 张是已付款的，共 €${paidCards * 20}）` : ''}，${cards.length ? '财务统计和导出的 CSV' : '签到统计和导出的签到表'}里也会少掉这些。<strong>删除后不能恢复。</strong><br><br>如果只是以后不来了，建议用「隐藏」：名单里看不到，记录都保留，随时能恢复。`,
+    buttons
+  });
+}
+
+/* 彻底删除：数据库会把他的饭卡、打饭记录一起删掉（散客流水不受影响） */
+async function deleteMember(memberId) {
+  const m = memberById(memberId);
+  if (!m) return;
+  const cardIds = new Set(state.cards.filter(c => c.member_id === memberId).map(c => c.id));
+  const backup = {
+    members: state.members.filter(x => x.id === memberId),
+    cards: state.cards.filter(c => c.member_id === memberId),
+    usages: state.usages.filter(u => u.member_id === memberId || cardIds.has(u.card_id)),
+    attendance: state.attendance.filter(a => a.member_id === memberId),
+  };
+  const ok = await optimistic(
+    () => {
+      state.members = state.members.filter(x => x.id !== memberId);
+      state.cards = state.cards.filter(c => c.member_id !== memberId);
+      state.usages = state.usages.filter(u => u.member_id !== memberId && !cardIds.has(u.card_id));
+      state.attendance = state.attendance.filter(a => a.member_id !== memberId);
+      dataVersion++;
+    },
+    () => {
+      for (const x of backup.members) upsertRow('members', x);
+      for (const x of backup.cards) upsertRow('meal_cards', x);
+      for (const x of backup.usages) upsertRow('card_usages', x);
+      for (const x of backup.attendance) upsertRow('attendance', x);
+    },
+    () => deleteRow('members', memberId),
+    { what: '删除失败' }
+  );
+  if (ok) toast(`已删除 ${m.name}`);
+}
+
+async function updateMember(id, patch, doneMsg) {
+  const m = memberById(id);
+  if (!m) return false;
+  const before = {}; for (const k of Object.keys(patch)) before[k] = m[k];
+  const ok = await optimistic(
+    () => patchRow('members', id, patch),
+    () => patchRow('members', id, before),
+    async () => upsertRow('members', await updateRow('members', id, patch))
+  );
+  if (ok && doneMsg) toast(doneMsg);
+  return ok;
+}
+
+/* 开卡（需要时顺带作废旧卡）——数据库里一步完成，中途失败不会只作废了旧卡 */
+async function issueCard(memberId, isPaid, replaceId = null) {
+  const name = memberById(memberId)?.name || '';
+  state.pendingOps++; writeSeq++;
+  try {
+    const saved = must(await sb.rpc('mealcard_issue_card', { p_member: memberId, p_paid: isPaid, p_replace: replaceId }));
+    if (replaceId) patchRow('meal_cards', replaceId, { status: 'ARCHIVED' });
+    upsertRow('meal_cards', saved);
+    render();
+    toast(`已为 ${name} 开通新的5次卡${isPaid ? '（已收20欧）' : '（暂未收款）'}`);
+  } catch (e) {
+    toast(friendly(e, '开卡失败'), 4200);
+    fullReload();
+  } finally { state.pendingOps--; }
+}
+
+async function addCashLog() {
+  const row = { id: uuid(), log_date: todayStr(), amount: 4, operator: state.user?.email || null, created_at: new Date().toISOString(), created_by: myActor(), _pending: true };
+  const ok = await optimistic(
+    () => upsertRow('cash_logs', row),
+    () => removeRow('cash_logs', row.id),
+    async () => upsertRow('cash_logs', await insertRow('cash_logs', { id: row.id, amount: 4, operator: row.operator }))
+  );
+  if (ok) {
+    const n = state.cashLogs.filter(l => l.log_date === todayStr()).length;
+    toast(`已记录一笔散客 4欧（今天第 ${n} 位）`);
+  }
+}
+
+async function deleteCashLog(id) {
+  const backup = state.cashLogs.find(l => l.id === id);
+  if (!backup) return;
+  const ok = await optimistic(
+    () => removeRow('cash_logs', id),
+    () => upsertRow('cash_logs', backup),
+    () => deleteRow('cash_logs', id)
+  );
+  if (ok) toast('已删除这笔散客记录');
+}
+
+/* ---------- 签到 ----------
+   点「签到」：记下现在的时间，按时间自动判断准时还是迟到（数据库按服务器时间再判一次，以它为准）。
+   已经签过的不会被改（另一台手机刚签过也一样）。改时间、改日期、补签，走下面的 setAttendance */
+async function checkIn(memberId, date) {
+  const m = memberById(memberId);
+  if (!m) return;
+  const old = attOf(memberId, date);
+  if (old && old._pending) { toast('正在保存，稍等一下再改'); return; }
+  if (old && old.status !== 'absent') { toast(`${m.name} 已经签过了（${attText(old)}）`); return; }
+  const isToday = date === todayStr();
+  const st = isToday && nowHM() >= lateAfter() ? 'late' : 'present';
+  const nowIso = new Date().toISOString();
+  const arrived = isToday ? nowIso : null;
+  const temp = { id: uuid(), member_id: memberId, att_date: date, status: st, arrived_at: arrived, created_at: nowIso, updated_at: nowIso, created_by: myActor(), _pending: true };
+  const backup = old ? { ...old } : null;
+  let saved = null;
+  const ok = await optimistic(
+    () => old ? patchRow('attendance', old.id, { status: st, arrived_at: arrived, _pending: true }) : upsertRow('attendance', temp),
+    () => old ? restorePending(backup) : removeRow('attendance', temp.id),
+    async () => {
+      const id = old ? old.id : temp.id;
+      // 数据库里的签到函数重发多少次结果都一样（签过的保留第一次），所以直接重试
+      saved = await withRetry(async () => must(await sb.rpc('mealcard_checkin', { p_id: id, p_member: memberId, p_date: date, p_status: null })));
+      if (saved.id !== id) removeRow('attendance', id);   // 数据库里是另一条（比如另一台手机抢先签了）：以它为准
+      upsertRow('attendance', saved);
+    },
+    { what: '签到没记上', resync: true }
+  );
+  if (!ok || !saved) return;
+  const time = saved.arrived_at ? fmtTime(toDate(saved.arrived_at)) : '';
+  if (!old && saved.id !== temp.id) toast(`${m.name} 刚被另一台手机签过了（${attText(saved)}）`, 3200);
+  else if (saved.status === 'late') { vibrate(30); toast(`迟 ${m.name} 迟到${time ? '（' + time + '）' : ''}`); }
+  else { vibrate(15); toast(`✓ ${m.name} 签到${time ? '（' + time + '）' : ''}`); }
+}
+
+/* 保存失败、回滚时：只把还是「本机正在保存」的那一行改回原样；期间别的手机推来的新版本不去盖 */
+function restorePending(bak) {
+  const cur = state.attendance.find(x => x.id === bak.id);
+  if (cur && cur._pending) patchRow('attendance', bak.id, { ...bak, _pending: false });
+}
+/* 补签 / 改签到：哪一天、几点到的（可以不填）、准时还是迟到。
+   from = 原来那条的日期：改了日期时，数据库把那条挪过去；目标那天已经有记录的，用这次的替换 */
+async function setAttendance(memberId, { date, time = '', status, from = null }) {
+  const move = from && from !== date ? from : null;
+  const src = move ? attOf(memberId, move) : null;
+  const dst = attOf(memberId, date);
+  const nowIso = new Date().toISOString();
+  const arrived = time ? madridIso(date, time) : null;
+  const temp = { id: uuid(), member_id: memberId, att_date: date, status, arrived_at: arrived, created_at: nowIso, updated_at: nowIso, created_by: myActor(), _pending: true };
+  const srcBak = src ? { ...src } : null, dstBak = dst ? { ...dst } : null;
+  let saved = null;
+  const ok = await optimistic(
+    () => {
+      if (src) removeRow('attendance', src.id);
+      if (dst) patchRow('attendance', dst.id, { status, arrived_at: arrived, _pending: true });
+      else upsertRow('attendance', temp);
+    },
+    () => {
+      if (srcBak && !state.attendance.some(x => x.id === srcBak.id)) upsertRow('attendance', srcBak);
+      if (dstBak) restorePending(dstBak); else removeRow('attendance', temp.id);
+    },
+    async () => {
+      // 重发多少次结果都一样（那天写成这些值、原来那天的删掉），所以直接重试
+      saved = await withRetry(async () => must(await sb.rpc('mealcard_set_attendance',
+        { p_member: memberId, p_date: date, p_status: status, p_time: time || null, p_from_date: move })));
+      const mine = dst ? dst.id : temp.id;
+      if (saved.id !== mine) removeRow('attendance', mine);
+      upsertRow('attendance', saved);
+    },
+    { what: '没保存上', resync: true }
+  );
+  return ok ? saved : null;
+}
+async function saveAttendance(memberId, { date, time = '', status, from = null, isNew = false }) {
+  const name = memberById(memberId)?.name || '';
+  const saved = await setAttendance(memberId, { date, time, status, from });
+  if (!saved) return null;
+  const what = `${name} · ${fmtCn(saved.att_date)} ${attText(saved)}`;
+  toast(isNew ? `${saved.att_date === todayStr() ? '已签到' : '已补签'}：${what}` : `已改好：${what}`, 2800);
+  return saved;
+}
+
+/* 撤销这一天的签到：回到没签到（日子过去了就算缺席）。seen = 打开表单时看到的那一条：
+   表单开着的时候另一台手机改了（比如人到了改成迟到），就不撤销，免得把别人刚记的删掉 */
+async function clearAttendance(memberId, date, seen = null) {
+  const old = attOf(memberId, date);
+  if (!old) return;
+  if (old._pending) { toast('正在保存，稍等一下再改'); return; }
+  const name = memberById(memberId)?.name || '';
+  if (seen && attSig(seen) !== attSig(old)) {
+    toast(`${name} 刚被另一台手机改成「${attText(old)}」，没有撤销`, 3600);
+    return;
+  }
+  const backup = { ...old };
+  let changed = false;
+  const ok = await optimistic(
+    () => removeRow('attendance', old.id),
+    () => upsertRow('attendance', backup),
+    async () => {
+      // 只删「我看到的那一条、而且还是那个状态」：期间另一台手机刚改过，就不删
+      const gone = await withRetry(async () => must(await sb.from('attendance').delete().eq('id', old.id).eq('status', old.status).select('id')));
+      if (!gone || !gone.length) { changed = true; throw Object.assign(new Error('changed_elsewhere'), { code: 'PGRST116' }); }
+    },
+    { what: '撤销没成功', handled: () => changed, resync: true }
+  );
+  if (ok) toast(old.status === 'absent' ? `已删掉 ${name} 这天的「缺席」记录`
+    : date < todayStr() && hadMeeting(date) && weekdayOf(date) === 0 ? `已撤销，${name} 这天算缺席` : `已撤销 ${name} 的签到`);
+  else if (changed) toast('这条记录刚被另一台手机改过了，已刷新，请再看一下', 3600);
+}
+
+/* 改「几点以后算迟到」：几台手机共用一份，只影响之后的签到 */
+async function setLateAfter(v) {
+  const before = state.settings.find(x => x.id === 'late_after');
+  const row = { id: 'late_after', value: v, updated_at: new Date().toISOString() };
+  const ok = await optimistic(
+    () => upsertRow('app_settings', row),
+    () => before ? upsertRow('app_settings', before) : removeRow('app_settings', 'late_after'),
+    async () => upsertRow('app_settings', await withRetry(async () => must(await sb.from('app_settings').upsert(row).select().single()))),
+    { what: '没保存上' }
+  );
+  if (ok) toast(`已改好：${v} 及以后签到算「迟」`);
+}
+
+/* ============================================================
+   渲染：外壳
+   ============================================================ */
+function paintSyncDot() {
+  const dot = document.querySelector('.sync-dot');
+  if (dot) { dot.className = 'sync-dot' + (state.realtimeOk ? '' : ' off'); dot.title = state.realtimeOk ? '实时同步正常' : '实时同步暂时断开，会自动重连'; }
+}
+/* 手指（或鼠标）按下还没抬起时先不重画。
+   重画会把手指底下的圆圈换成一个新的，这一下就成了「点了没反应」——
+   快速连着给几个人打卡、或者另一台手机同时在操作时最容易碰到。
+   抬手后马上补画；万一收不到抬手，最多等 1.5 秒。 */
+const pressing = new Set();
+let renderHeld = false, holdGuard = null;
+function flushHeldRender() {
+  if (renderHeld && !pressing.size) render();
+}
+addEventListener('pointerdown', e => {
+  pressing.add(e.pointerId);
+  clearTimeout(holdGuard);
+  holdGuard = setTimeout(() => { pressing.clear(); flushHeldRender(); }, 1500);
+}, true);
+const lifted = e => {
+  if (pressing.delete(e.pointerId) && !pressing.size) {
+    clearTimeout(holdGuard);
+    setTimeout(flushHeldRender, 0);     // 等这次抬手本身的处理（比如打卡）先跑完
+  }
+};
+addEventListener('pointerup', lifted, true);
+addEventListener('pointercancel', lifted, true);
+
+function render() {
+  const app = $('app');
+  if (!state.user) return;                  // 已退出（登录页在显示），不要把旧界面画回来
+  if (app.dataset.shell && pressing.size) { renderHeld = true; return; }
+  renderHeld = false;
+  if (!app.dataset.shell) {
+    app.dataset.shell = '1';
+    app.innerHTML = `
+      <header class="app-header">
+        <div class="header-row">
+          <div class="header-brand">
+            <span class="sym-logo header-logo" role="img" aria-label="SYM"></span>
+            <h1 class="header-title">繁星团契<span class="ht-tail">管理系统</span></h1>
+          </div>
+          <div class="header-actions">
+            <button class="hist-btn" id="histBtn" type="button" title="谁、什么时候、改了什么"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>记录</button>
+            <button class="signout" id="signoutBtn">退出</button>
+          </div>
+        </div>
+        <button class="header-sub" id="headerSub" type="button" title="点一下刷新"></button>
+      </header>
+      <main id="main"></main>
+      <button class="fab" id="fabCash">+ 4欧单次</button>
+      <nav class="tabbar" id="tabbar">
+        <button class="tab-btn" data-tab="serve">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 13a8 8 0 0 1 16 0"/><path d="M2.5 13h19"/><path d="M12 13V7"/><path d="M9 20h6"/></svg>
+          <span>打饭台</span>
+        </button>
+        <button class="tab-btn" data-tab="attend">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4.5" width="14" height="16.5" rx="2"/><path d="M9 3h6v3H9z"/><path d="M9 13.5l2.2 2.2 4.3-4.6"/></svg>
+          <span>签到</span>
+        </button>
+        <button class="tab-btn" data-tab="roster">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+          <span>名册</span>
+        </button>
+        <button class="tab-btn" data-tab="finance">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 20V11M10 20V4M16 20v-6M22 20H2"/></svg>
+          <span>财务</span>
+        </button>
+      </nav>`;
+    $('signoutBtn').addEventListener('click', () => showModal({
+      title: '退出登录？',
+      bodyHtml: `退出以后，这台手机要重新输入${isShared() ? '共用密码' : '账号和密码'}才能用。`,
+      buttons: [
+        { label: '不退出', variant: 'btn-ghost', onClick: c => c() },
+        { label: '退出', variant: 'btn-danger', onClick: async c => { c(); try { await sb.auth.signOut(); } catch {} location.reload(); } }
+      ]
+    }));
+    $('fabCash').addEventListener('click', addCashLog);
+    $('histBtn').addEventListener('click', openHistory);
+    $('tabbar').addEventListener('click', e => {
+      const btn = e.target.closest('.tab-btn');
+      if (!btn) return;
+      state.tab = btn.dataset.tab;
+      rememberTab(state.tab);
+      render();
+    });
+    // 全屏模式（加到主屏幕）下没有浏览器刷新键，点日期这一行就能手动刷新
+    $('headerSub').addEventListener('click', async () => {
+      try { await fullReload({ silent: false }); toast('已刷新'); }
+      catch (e) { toast(friendly(e, '刷新失败'), 3600); }
+    });
+  }
+
+  $('headerSub').innerHTML = `<span class="sync-dot${state.realtimeOk ? '' : ' off'}"></span>${esc(todayStr())} · ${esc(whoAmI())} <span class="refresh-ico" aria-hidden="true">↻</span>`;
+  paintSyncDot();
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === state.tab));
+  $('fabCash').style.display = state.tab === 'serve' ? 'block' : 'none';
+  $('main').dataset.tab = state.tab;   // 决定底部留白够不够躲开悬浮按钮
+  syncHeaderHeight();
+
+  if (!TABS.includes(state.tab)) state.tab = 'serve';
+  if (state.tab === 'serve') renderServe();
+  else if (state.tab === 'attend') renderAttend();
+  else if (state.tab === 'roster') renderRoster();
+  else renderFinance();
+}
+
+/* 把顶栏实际高度写进 CSS 变量，供搜索框的吸顶位置使用。
+   高度会随字号、安全区、横竖屏变化，所以不能写死。 */
+function syncHeaderHeight() {
+  const h = document.querySelector('.app-header');
+  if (h) document.documentElement.style.setProperty('--header-h', h.offsetHeight + 'px');
+}
+addEventListener('resize', syncHeaderHeight);
+addEventListener('orientationchange', () => setTimeout(syncHeaderHeight, 150));
+
+/* ---------- Tab 1 打饭台 ----------
+   搜索框只建一次，之后敲字只重画下面的列表。
+   每敲一个字就重建输入框的话，中文拼音输入法的联想会被打断。 */
+function renderServe() {
+  const main = $('main');
+  if (main.dataset.view !== 'serve') {
+    main.dataset.view = 'serve';
+    main.innerHTML = `<div class="search-bar">
+      <input id="searchInput" type="search" placeholder="搜索姓名、拼音首字母或小组" value="${esc(state.search)}"
+        autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="search">
+      <div id="groupBar"></div>
+    </div><div id="serveList"></div>`;
+
+    bindSearchInput($('searchInput'), v => { state.search = v; renderServeList(); });   // 只换列表，输入框原地不动
+  }
+  renderGroupBar();
+  renderServeList();
+}
+
+/* 搜索框：输入法正在联想（拼音还没选字）时先不过滤；
+   手机键盘上的「搜索」键收起键盘，好看清名单（输入法选字时按的回车不算） */
+function bindSearchInput(input, onChange) {
+  let composing = false;
+  input.addEventListener('compositionstart', () => { composing = true; });
+  input.addEventListener('compositionend', e => { composing = false; onChange(e.target.value); });
+  input.addEventListener('input', e => { if (!composing) onChange(e.target.value); });
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.isComposing && e.keyCode !== 229) input.blur();
+  });
+}
+
+/* 打饭台只列有饭卡的人（名册里的人不一定都留下来吃饭，名单短了找人快）：
+   - 使用中的卡（包括还没付钱的）；
+   - 今天刚用完的卡留到今天结束：点错了还能撤销，当场买新卡也方便；第二天就不显示了；
+   - 没有饭卡的人：搜名字时列在下面，点「开卡」以后就出现在打饭台上（或者在「名册」里开卡） */
+function serveCardOf(m) {
+  const c = currentCardOf(m.id);
+  if (!c) return null;
+  if (c.status === 'ACTIVE') return c;
+  const us = usagesOf(c.id);
+  return c.status === 'EXHAUSTED' && us.length && us[us.length - 1].used_date === todayStr() ? c : null;
+}
+const serveMembers = () => activeMembers().filter(m => serveCardOf(m));
+const groupsOf = list => [...new Set(list.map(groupOf).filter(Boolean))].sort(compareGroups);
+/* 选着的小组里已经没有人有饭卡了（比如最后一个人的卡用完了，或者刚导入的新组还没人开卡）：回到「全部」。
+   不然列表是空的，上面又没有那个小组的按钮可以点回来。改了就返回 true */
+function checkServeGroup(holders) {
+  if (!state.group) return false;
+  const ok = state.group === '__none__'
+    ? holders.some(m => !groupOf(m)) && groupsOf(holders).length > 0
+    : holders.some(m => groupOf(m) === state.group);
+  if (!ok) state.group = '';
+  return !ok;
+}
+function renderGroupBar() {
+  const bar = $('groupBar');
+  if (!bar) return;
+  const holders = serveMembers();
+  checkServeGroup(holders);
+  const groups = groupsOf(holders);
+  if (!groups.length) { bar.innerHTML = ''; bar.className = ''; return; }
+  const hasUngrouped = holders.some(m => !groupOf(m));
+  const chip = (val, label) =>
+    `<button class="group-chip${state.group === val ? ' active' : ''}" data-group="${esc(val)}">${esc(label)}</button>`;
+  bar.className = 'group-bar';
+  bar.innerHTML = chip('', '全部') + groups.map(g => chip(g, g)).join('')
+    + (hasUngrouped ? chip('__none__', '未分组') : '');
+  bar.querySelectorAll('[data-group]').forEach(b =>
+    b.addEventListener('click', () => { state.group = b.dataset.group; renderGroupBar(); renderServeList(); }));
+}
+
+function renderServeList() {
+  const listEl = $('serveList');
+  if (!listEl) return;
+  const q = state.search.trim().toLowerCase();
+  const holders = serveMembers();
+  if (checkServeGroup(holders)) renderGroupBar();
+  const groups = groupsOf(holders);
+  const hit = m => !q || (m.name || '').toLowerCase().includes(q)
+       || (m.pinyin || '').toLowerCase().includes(q)
+       || groupOf(m).toLowerCase().includes(q);
+  // 一开始搜索就跨小组找：要不然人在别的组，搜了半天搜不到，打饭现场最耽误事
+  const list = (q ? holders : filterByGroup(holders)).filter(hit);
+  // 搜名字时，名册里还没有饭卡的人也列出来（放在下面），点「开卡」就能吃
+  const othersAll = q ? activeMembers().filter(m => !serveCardOf(m) && hit(m)) : [];
+  const others = othersAll.slice(0, 8);
+
+  const items = [];                 // 每一项对应列表里的一个元素：{ key, html }
+  if (!list.length && !others.length) {
+    const msg = activeMembers().length === 0
+      ? '还没有成员。<br>切到「名册」页添加第一个人，或批量导入名单。'
+      : q ? '没有找到匹配的成员'
+      : !holders.length ? '还没有人开饭卡。<br>要在这里吃饭的人，到「名册」点他名字右边的「开卡」，<br>或者在上面搜他的名字。'
+      : '这个小组还没有人开饭卡';
+    items.push({ key: 'empty', html: `<div class="empty-state">${msg}</div>` });
+  } else {
+    // 看「全部」且没在搜索时，插入小组分隔标题；人一多，滚动时靠它定位
+    const showHeads = !q && !state.group && groups.length > 0;
+    const headCount = {};
+    if (showHeads) for (const m of list) { const h = groupOf(m) || '未分组'; headCount[h] = (headCount[h] || 0) + 1; }
+    let lastHead = null;
+
+    for (const m of list) {
+      if (showHeads) {
+        const head = groupOf(m) || '未分组';
+        if (head !== lastHead) {
+          lastHead = head;
+          items.push({ key: 'h:' + head, html: `<div class="roster-group-head serve-group-head">${esc(head)}（${headCount[head]}）</div>` });
+        }
+      }
+      const card = currentCardOf(m.id);
+      const used = card && card.status === 'EXHAUSTED';
+      let badge, punches = '';
+      if (card) {
+        badge = card.is_paid
+          ? `<button class="badge badge-paid" data-toggle-paid="${esc(card.id)}">已付</button>`
+          : `<button class="badge badge-unpaid" data-toggle-paid="${esc(card.id)}">未付 · 点此改</button>`;
+        const us = usagesOf(card.id);
+        for (let i = 0; i < 5; i++) {
+          if (i < us.length) {
+            punches += `<div class="punch filled${us[i]._pending ? ' pending' : ''}" data-usage="${esc(us[i].id)}">${esc(fmtShort(us[i].used_date))}</div>`;
+          } else if (i === us.length && card.status === 'ACTIVE') {
+            punches += `<div class="punch next" data-punch-card="${esc(card.id)}" data-punch-member="${esc(m.id)}">+</div>`;
+          } else {
+            punches += `<div class="punch disabled">·</div>`;
+          }
+        }
+      } else {
+        badge = '<span class="badge badge-none">无饭卡</span>';
+      }
+      // 已按小组筛选、或上面已有分组标题时就不用重复标；
+      // 但搜索是跨小组的，这时必须标出来才知道人在哪组
+      const groupTag = (!showHeads && (q || !state.group) && groupOf(m))
+        ? `<span class="member-group">${esc(groupOf(m))}</span>` : '';
+      items.push({ key: 'm:' + m.id, html: `<div class="member-row${used ? ' exhausted' : ''}">
+        <div class="member-top">
+          <div class="member-name-wrap"><span class="member-name">${esc(m.name)}</span>${groupTag}${badge}</div>
+          ${!card || used ? `<button class="quick-issue-btn" data-issue="${esc(m.id)}">+ ${used ? '开新卡' : '开卡'}</button>` : ''}
+        </div>
+        ${card ? `<div class="punches">${punches}</div>` : ''}
+      </div>` });
+    }
+    if (others.length) {
+      items.push({ key: 'h:nocard', html: `<div class="roster-group-head serve-group-head">名册里没有饭卡的（点「开卡」就能用）</div>` });
+      for (const m of others) {
+        const last = currentCardOf(m.id);
+        items.push({ key: 'n:' + m.id, html: `<div class="member-row nocard">
+          <div class="member-top">
+            <div class="member-name-wrap"><span class="member-name">${esc(m.name)}</span>${groupOf(m) ? `<span class="member-group">${esc(groupOf(m))}</span>` : ''}<span class="badge badge-none">${last ? '上一张已用完' : '没有饭卡'}</span></div>
+            <button class="quick-issue-btn" data-issue="${esc(m.id)}">+ ${last ? '开新卡' : '开卡'}</button>
+          </div></div>` });
+      }
+      if (othersAll.length > others.length)
+        items.push({ key: 'more', html: `<div class="list-meta serve-more">还有 ${othersAll.length - others.length} 个没有饭卡的人也对得上，名字再多打几个字</div>` });
+    }
+    if (!q && holders.length < activeMembers().length)
+      items.push({ key: 'note', html: `<div class="stat-note serve-note">这里只列有饭卡的人。没有饭卡的：搜名字，或者到「名册」开卡。</div>` });
+  }
+
+  // 只换有变化的那几行。人一多（上百人），整张列表重画在低端手机上要几百毫秒，
+  // 而打一次卡、另一台手机同步过来一次，通常只改动一行。
+  // 列表结构变了（搜索、筛选、加人、删人）才整张重画。
+  const prev = listEl._items;
+  const sameShape = prev && prev.length === items.length && listEl.children.length === items.length
+    && prev.every((p, i) => p.key === items[i].key);
+  if (sameShape) {
+    items.forEach((it, i) => {
+      if (prev[i].html === it.html) return;
+      const tpl = document.createElement('template');
+      tpl.innerHTML = it.html;
+      const el = tpl.content.firstElementChild;
+      listEl.children[i].replaceWith(el);
+      bindServeRows(el);
+    });
+  } else {
+    listEl.innerHTML = items.map(it => it.html).join('');
+    bindServeRows(listEl);
+  }
+  listEl._items = items;
+}
+
+function bindServeRows(root) {
+  root.querySelectorAll('[data-issue]').forEach(b =>
+    b.addEventListener('click', () => openIssueFlow(b.dataset.issue)));
+  // 点按由页面顶部那段整页监听统一识别。这里给每个圆圈挂一个空的 click 监听，不能删：
+  // 安卓 Chrome 会把手指点的位置「吸」到附近真正可点的元素上。圆圈如果不算可点，
+  // 点在靠近底部导航栏的「+」上就会被吸到导航按钮——卡没打上，页面反而跳去了名册。
+  root.querySelectorAll('.punch.next, .punch.filled').forEach(el => el.addEventListener('click', noop));
+  // 点「未付 / 已付」标签直接改收款状态
+  root.querySelectorAll('[data-toggle-paid]').forEach(b =>
+    b.addEventListener('click', () => askTogglePaid(b.dataset.togglePaid)));
+}
+
+/* 点一下已打的孔就能撤销（长按也行），不用去猜有没有隐藏手势 */
+function askRevoke(id) {
+  const u = state.usages.find(x => x.id === id);
+  if (!u || u._pending) return;
+  const who = memberById(u.member_id)?.name || '';
+  showModal({
+    title: '撤销这次打饭',
+    bodyHtml: `撤销 <strong>${esc(who)}</strong> 在 <strong>${esc(u.used_date)}</strong> 的这次打饭记录吗？${u.created_by ? `（${esc(u.created_by)} 打的卡）` : ''}次数会退回这张卡。`,
+    buttons: [
+      { label: '不撤销', variant: 'btn-ghost', onClick: close => close() },
+      { label: '确认撤销', variant: 'btn-danger', onClick: close => { close(); revokeUsage(u); } }
+    ]
+  });
+}
+
+function askTogglePaid(cardId) {
+  const card = state.cards.find(c => c.id === cardId);
+  if (!card) return;
+  const name = memberById(card.member_id)?.name || '';
+  if (card.is_paid) {
+    showModal({
+      title: '改回未付款？',
+      bodyHtml: `${esc(name)} 这张卡目前是「已付20欧」。确定要改回未付款吗？`,
+      buttons: [
+        { label: '取消', variant: 'btn-ghost', onClick: close => close() },
+        { label: '改回未付', variant: 'btn-danger', onClick: close => { close(); setPaid(cardId, false); } }
+      ]
+    });
+  } else {
+    showModal({
+      title: '收到 20 欧了？',
+      bodyHtml: `把 ${esc(name)} 这张卡标记为已付款。这 20 欧会算进今天的应收。`,
+      buttons: [
+        { label: '还没收到', variant: 'btn-ghost', onClick: close => close() },
+        { label: '已收20欧', variant: 'btn-primary', onClick: close => { close(); setPaid(cardId, true); } }
+      ]
+    });
+  }
+}
+
+/* 开卡流程：先确认要不要作废旧卡，再选收款状态。
+   旧卡只在最后一步真正开卡时才作废——中途取消什么都不会变。 */
+function openIssueFlow(memberId) {
+  const m = memberById(memberId);
+  if (!m) return;
+  const existing = activeCardOf(memberId);
+  const remaining = existing ? 5 - usagesOf(existing.id).length : 0;
+
+  const choosePaid = (replaceId) => showModal({
+    title: `为 ${m.name} 开通新5次卡`,
+    bodyHtml: replaceId
+      ? `<div style="color:var(--ink-soft)">旧卡剩下的 <strong>${remaining}</strong> 次会作废。请选择新卡 20 欧的收款状态：</div>`
+      : `<div style="color:var(--ink-soft)">请选择这张卡 20 欧的收款状态。选「暂未收款」也会正常开卡，之后点名字旁的「未付」标签就能改。</div>`,
+    buttons: [
+      { label: '取消', variant: 'btn-ghost', onClick: close => close() },
+      { label: '暂未收款', variant: 'btn-secondary', onClick: close => { close(); issueCard(memberId, false, replaceId); } },
+      { label: '已收20欧', variant: 'btn-primary', onClick: close => { close(); issueCard(memberId, true, replaceId); } }
+    ]
+  });
+
+  if (existing && remaining > 0) {
+    showModal({
+      title: `${m.name} 还有未用完的饭卡`,
+      bodyHtml: `当前这张卡还剩 <strong>${remaining}</strong> 次没用。确定要作废旧卡、开一张新的吗？`,
+      buttons: [
+        { label: '取消', variant: 'btn-ghost', onClick: close => close() },
+        { label: '作废旧卡并开新卡', variant: 'btn-danger', onClick: close => { close(); choosePaid(existing.id); } }
+      ]
+    });
+  } else {
+    choosePaid(null);
+  }
+}
+
+/* ---------- Tab 2 名册 ---------- */
+/* ---------- 签到页 ----------
+   门口签到要快：搜拼音首字母 → 点「签到」，几点到的、准时还是迟到都自动记。
+   和打饭台一样：搜索框只建一次，敲字只重画名单；名单只换有变化的那几行；
+   点击都挂在外层容器上（重画也不用重新绑定）。 */
+function setHtml(el, html) { if (el && el._html !== html) { el.innerHTML = html; el._html = html; } }
+function renderAttend() {
+  const main = $('main');
+  if (main.dataset.view !== 'attend') {
+    main.dataset.view = 'attend';
+    main.innerHTML = `<div id="attDateBar"></div><div id="attStats"></div>
+      <div class="search-bar">
+        <input id="attSearch" type="search" placeholder="搜索姓名、拼音首字母或小组" value="${esc(state.attSearch)}"
+          autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="search">
+        <div id="attGroupBar"></div>
+      </div>
+      <div id="attList"></div><div id="attFoot"></div>`;
+    bindSearchInput($('attSearch'), v => { state.attSearch = v; renderAttendList(); });
+    $('attDateBar').addEventListener('click', onAttDateBarClick);
+    $('attDateBar').addEventListener('change', e => { if (e.target.id === 'attDatePick' && e.target.value) setAttDate(e.target.value); });
+    $('attStats').addEventListener('click', e => {
+      const b = e.target.closest('[data-att-filter]');
+      if (b) { state.attFilter = b.dataset.attFilter; renderAttendStats(); renderAttendList(); return; }
+      if (e.target.closest('#attLateBtn')) openLateModal();
+      if (e.target.closest('#attLatest')) setAttDate(latestSunday(todayStr()));
+    });
+    $('attGroupBar').addEventListener('click', e => {
+      const b = e.target.closest('[data-att-group]');
+      if (!b) return;
+      state.attGroup = b.dataset.attGroup;
+      renderAttendStats(); renderAttendGroupBar(); renderAttendList();
+    });
+    $('attList').addEventListener('click', onAttListClick);
+    $('attFoot').addEventListener('click', onAttFootClick);
+  }
+  renderAttendDateBar(); renderAttendStats(); renderAttendGroupBar(); renderAttendList(); renderAttendFoot();
+}
+
+/* 日期：‹ › 一次翻一个周日；点中间的日期弹出周日列表（手机自带的滚轮 / 下拉框） */
+const attOptions = (sel, extra) => attDateChoices(extra).map(x =>
+  `<option value="${x}"${x === sel ? ' selected' : ''}>${esc(fmtCn(x))}${x === todayStr() ? '（今天）' : ''}</option>`).join('');
+function renderAttendDateBar() {
+  const d = attDate(), t = todayStr();
+  setHtml($('attDateBar'), `<div class="att-datebar">
+      <button class="att-nav" id="attPrev" type="button" aria-label="上一个周日">‹</button>
+      <div class="att-date">
+        <span class="att-date-main">${esc(fmtCn(d))}</span><span class="att-date-sub${d === t ? ' is-today' : ''}">${esc(attAgo(d))}</span>
+        <select id="attDatePick" aria-label="选别的周日">${attOptions(d, d)}</select>
+      </div>
+      <button class="att-nav" id="attNext" type="button" aria-label="下一个周日"${d >= latestSunday(t) ? ' disabled' : ''}>›</button>
+    </div>`);
+}
+function onAttDateBarClick(e) {
+  const d = attDate(), list = attDateChoices(d);          // 新的在前
+  if (e.target.closest('#attPrev')) return setAttDate(list.find(x => x < d) || prevSunday(d));
+  if (e.target.closest('#attNext')) { const n = list.filter(x => x > d).pop(); if (n) setAttDate(n); }
+}
+function setAttDate(d) {
+  const t = todayStr();
+  state.attDate = d > t ? latestSunday(t) : d;
+  attAutoFor = t;
+  render();
+}
+
+/* 当前小组筛选下的人（不管搜索和状态筛选）：统计按这个范围。
+   已经隐藏的人，这天还算数的也列出来：这天有记录的（不然看不到、改不了），
+   或者离开以前没来、算缺席的（和导出的签到表一致） */
+function attPeople(d) {
+  return [...activeMembers(), ...state.members.filter(m => m.active === false && attStatusFor(m, d)).sort(compareMembers)];
+}
+function attScope() {
+  const all = attPeople(attDate());
+  if (!state.attGroup) return all;
+  if (state.attGroup === '__none__') return all.filter(m => !groupOf(m));
+  return all.filter(m => groupOf(m) === state.attGroup);
+}
+/* 这一天「应该来」的人：今天（周日）是名册里的所有人；过去的日子是那天以前就在名册里的（或者这天本来就有记录的）。
+   那天才加、以后才加进名册的人照样列在名单里（方便补签），但不算未签、也不算缺席 */
+const expectedOn = (m, d) => !!attOf(m.id, d) || joinedOn(m) < d || (d >= todayStr() && joinedOn(m) <= d);
+/* 第四格：今天还没过完、那天没聚会、不是周日，叫「未签」；周日聚会过去了，就是「缺席」 */
+const attRestIsAbsent = d => d < todayStr() && weekdayOf(d) === 0 && hadMeeting(d);
+function attKey(m, d) {           // present / late / rest（未签或缺席）/ ''（那时还没加入）
+  const a = attOf(m.id, d);
+  if (a && a.status !== 'absent') return a.status;
+  return expectedOn(m, d) ? 'rest' : '';
+}
+function renderAttendStats() {
+  const d = attDate(), t = todayStr(), last = latestSunday(t);
+  const c = { all: 0, present: 0, late: 0, rest: 0 };
+  for (const m of attScope()) { const k = attKey(m, d); if (k) { c.all++; c[k]++; } }
+  const chip = (f, n, label, cls) =>
+    `<button type="button" class="att-stat ${cls}${state.attFilter === f ? ' active' : ''}" data-att-filter="${f}"><b>${n}</b><span>${label}</span></button>`;
+  const back = d !== last ? `<button type="button" class="link-btn" id="attLatest">回到${last === t ? '今天' : '上周日'}</button>` : '';
+  const rule = d === t
+    ? `<span>${esc(lateAfter())} 及以后签到记为「迟」</span><button type="button" class="link-btn" id="attLateBtn">改时间</button>`
+    : weekdayOf(d) !== 0 ? `<span>这天不是周日（以前记的特别聚会），没签到的不算缺席</span>${back}`
+    : !hadMeeting(d) ? `<span>这天还没有签到记录。没聚会就不用管，有的话点「补签」</span>${back}`
+    : `<span>没签到的人自动算缺席，忘了签的点「补签」</span>${back}`;
+  setHtml($('attStats'), `<div class="att-stats">
+      ${chip('', c.all, '全部', 's-all')}${chip('present', c.present, '✓ 准时', 's-present')}${chip('late', c.late, '迟到', 's-late')}${attRestIsAbsent(d) ? chip('rest', c.rest, '✗ 缺席', 's-absent') : chip('rest', c.rest, '未签', 's-none')}
+    </div>
+    <div class="att-rule">${rule}</div>`);
+}
+function renderAttendGroupBar() {
+  const bar = $('attGroupBar');
+  if (!bar) return;
+  const groups = groupList();
+  if (!groups.length) { setHtml(bar, ''); bar.className = ''; return; }
+  const hasUngrouped = activeMembers().some(m => !groupOf(m));
+  if (state.attGroup && state.attGroup !== '__none__' && !groups.includes(state.attGroup)) state.attGroup = '';
+  const chip = (val, label) =>
+    `<button type="button" class="group-chip${state.attGroup === val ? ' active' : ''}" data-att-group="${esc(val)}">${esc(label)}</button>`;
+  bar.className = 'group-bar';
+  setHtml(bar, chip('', '全部') + groups.map(g => chip(g, g)).join('') + (hasUngrouped ? chip('__none__', '未分组') : ''));
+}
+
+/* 名单：今天（周日）右边是「签到」，一点就记下现在的时间；
+   过去的周日右边是「补签」，没签到的人名字旁边自动标「✗ 缺席」 */
+function renderAttendList() {
+  const listEl = $('attList');
+  if (!listEl) return;
+  const d = attDate(), live = d === todayStr();
+  const raw = state.attSearch.trim(), q = raw.toLowerCase();
+  // 一开始搜索就跨小组找（和打饭台一样）
+  let list = (q ? attPeople(d) : attScope()).filter(m => !q
+    || (m.name || '').toLowerCase().includes(q) || (m.pinyin || '').toLowerCase().includes(q) || groupOf(m).toLowerCase().includes(q));
+  if (state.attFilter) list = list.filter(m => attKey(m, d) === state.attFilter);
+
+  const items = [];
+  if (!list.length) {
+    if (!activeMembers().length) {
+      items.push({ key: 'empty', html: `<div class="empty-state">还没有成员。<br>点下面「新朋友」加人，或者到「名册」页批量导入名单。</div>` });
+    } else if (q) {
+      items.push({ key: 'empty:' + q, html: `<div><div class="empty-state">没找到「${esc(raw)}」${state.attFilter ? '（或者不在上面选的那一类里）' : ''}</div>
+        ${raw.length <= 20 ? `<button type="button" class="add-btn" data-att-add="${esc(raw)}">+ 把「${esc(raw)}」加入名册并${live ? '签到' : '补签'}</button>` : ''}</div>` });
+    } else {
+      items.push({ key: 'empty:f', html: `<div class="empty-state">${state.attFilter === 'rest'
+        ? (attRestIsAbsent(d) ? '这个范围里没有人缺席' : '这个范围里的人都签过了') : '这个范围里没有这一类的人'}</div>` });
+    }
+  } else {
+    const showHeads = !q && !state.attGroup && groupList().length > 0;
+    const heads = {};
+    if (showHeads) for (const m of list) {
+      const h = groupOf(m) || '未分组', a = attOf(m.id, d);
+      const x = heads[h] || (heads[h] = { n: 0, come: 0 });
+      if (expectedOn(m, d)) x.n++;
+      if (a && a.status !== 'absent') x.come++;
+    }
+    let lastHead = null;
+    for (const m of list) {
+      if (showHeads) {
+        const head = groupOf(m) || '未分组';
+        if (head !== lastHead) {
+          lastHead = head;
+          items.push({ key: 'h:' + head, html: `<div class="roster-group-head serve-group-head">${esc(head)}（${heads[head].n}）<span class="att-head-n">到 ${heads[head].come}</span></div>` });
+        }
+      }
+      const a = attOf(m.id, d), done = !!a && a.status !== 'absent', id = esc(m.id);
+      const tag = !showHeads && groupOf(m) ? `<span class="member-group">${esc(groupOf(m))}</span>` : '';
+      const hid = m.active === false ? '<span class="member-group">已隐藏</span>' : '';
+      const meal = !done && ateOn(m.id, d) ? '<span class="att-meal">打过饭</span>' : '';
+      const mark = !done && attStatusFor(m, d) === 'absent' ? '<span class="att-chip att-absent">✗ 缺席</span>'
+        : (!a && !expectedOn(m, d) ? `<span class="member-group">${joinedOn(m) === d ? '这天才加入名册' : '那时还没加入'}</span>` : '');
+      const right = done ? `<button type="button" class="att-pill ${ATT[a.status].cls}" data-att-menu="${id}">${esc(attText(a))}</button>`
+        : live ? `<button type="button" class="att-in" data-att-in="${id}">签到</button>`
+        : `<button type="button" class="att-fix" data-att-menu="${id}">补签</button>`;
+      items.push({ key: 'm:' + m.id, html: `<div class="att-row${a && a._pending ? ' pending' : ''}">
+        <button type="button" class="att-who" data-att-menu="${id}"><span class="member-name">${esc(m.name)}</span>${tag}${hid}${mark}${meal}</button>
+        ${right}
+      </div>` });
+    }
+  }
+  const prev = listEl._items;
+  const sameShape = prev && prev.length === items.length && listEl.children.length === items.length
+    && prev.every((p, i) => p.key === items[i].key);
+  if (sameShape) {
+    items.forEach((it, i) => {
+      if (prev[i].html === it.html) return;
+      const tpl = document.createElement('template');
+      tpl.innerHTML = it.html;
+      listEl.children[i].replaceWith(tpl.content.firstElementChild);
+    });
+  } else {
+    listEl.innerHTML = items.map(it => it.html).join('');
+  }
+  listEl._items = items;
+}
+
+function onAttListClick(e) {
+  const d = attDate();
+  // 搜到只剩这一个人：签完自动清空搜索框，键盘不收，接着就能搜下一个人
+  const single = () => !!state.attSearch.trim() && $('attList').querySelectorAll('.att-row').length === 1;
+  const clearSearch = () => {
+    state.attSearch = '';
+    const i = $('attSearch');
+    if (i) { i.value = ''; i.focus(); }
+    renderAttendList();
+  };
+  const inBtn = e.target.closest('[data-att-in]');
+  if (inBtn) {
+    const one = single();
+    checkIn(inBtn.dataset.attIn, d);
+    if (one) clearSearch();
+    return;
+  }
+  const menu = e.target.closest('[data-att-menu]');
+  if (menu) { openAttSheet(menu.dataset.attMenu, d, single() ? clearSearch : null); return; }
+  const add = e.target.closest('[data-att-add]');
+  if (add) openAddMemberModal({ checkInDate: d, name: add.dataset.attAdd });
+}
+
+function renderAttendFoot() {
+  const live = attDate() === todayStr();
+  setHtml($('attFoot'), `<button type="button" class="add-btn" id="attNewBtn">+ 新朋友：加入名册并${live ? '签到' : '补签'}</button>
+    <button type="button" class="export-btn" id="attExportBtn">导出签到表 (CSV)</button>
+    <div class="stat-note att-note">导出的表和纸质「繁星签到表」一样：一人一行，每次聚会一列，格子里是 ✓ / 迟 / ✗。周日过去以后，没签到的人自动算缺席。</div>`);
+}
+function onAttFootClick(e) {
+  if (e.target.closest('#attNewBtn')) return openAddMemberModal({ checkInDate: attDate() });
+  if (e.target.closest('#attExportBtn')) return openAttExport();
+}
+
+/* 点名字、点已签的状态、点「补签」：一个小表单，日期、几点到的、准时 / 迟到都能改。
+   - 补签：默认就是正在看的那个周日、不填时间、准时，直接点「补签」就好；
+   - 填了时间，按「几点以后算迟」自动选准时 / 迟到，也可以自己再点；
+   - 改到别的周日：那天已经有他的签到的，会提示「用这次的替换」 */
+const attSig = a => a ? `${a.id}|${a.status}|${a.arrived_at ? toDate(a.arrived_at).getTime() : ''}` : '';
+function openAttSheet(memberId, date, afterSave = null) {
+  const m = memberById(memberId);
+  if (!m) return;
+  const a = attOf(memberId, date);
+  if (a && a._pending) { toast('正在保存，稍等一下再改'); return; }
+  const t = todayStr();
+  const has = !!a && a.status !== 'absent';            // 已经签过到（准时 / 迟到）
+  const time0 = has ? (a.arrived_at ? fmtTime(toDate(a.arrived_at)) : '') : (date === t ? nowHM() : '');
+  let status = has ? a.status : (time0 && time0 >= lateAfter() ? 'late' : 'present');
+  const ref = showModal({
+    title: `${m.name} · ${has ? '改签到' : date === t ? '签到' : '补签'}`,
+    bodyHtml: `<div class="field-label">哪个周日</div>
+      <select id="asDate">${attOptions(date, date)}</select>
+      <div class="field-label">几点到的（不知道可以不填）</div>
+      <div class="as-time"><input id="asTime" type="time" step="60" value="${time0}"><button type="button" class="link-btn" id="asNoTime">不填</button></div>
+      <div class="field-label">准时还是迟到</div>
+      <div class="as-seg" id="asSeg"><button type="button" class="as-st s-present" data-st="present">✓ 准时</button><button type="button" class="as-st s-late" data-st="late">迟到</button></div>
+      <div class="stat-note" id="asNote"></div>
+      ${has ? '<button type="button" class="link-danger" id="asClear">撤销这次签到</button>'
+        : a ? '<button type="button" class="link-danger" id="asClear">删掉这条「缺席」记录</button>' : ''}`,
+    buttons: [
+      { label: '取消', variant: 'btn-ghost', onClick: c => c() },
+      { label: '保存', variant: 'btn-primary', onClick: c => save(c) }
+    ]
+  });
+  const card = ref.card, pick = s => card.querySelector(s);
+  const dateEl = pick('#asDate'), timeEl = pick('#asTime'), noteEl = pick('#asNote'), okBtn = pick('.btn-primary');
+  const hm = () => String(timeEl.value || '').slice(0, 5);
+  // 改到的那天他已经有的签到（准时 / 迟到）；shown = 表单上次提示的是哪一条，保存时再核对一次
+  const target = d => { const o = d !== date ? attOf(memberId, d) : null; return o && o.status !== 'absent' ? o : null; };
+  let shown = '', timeTouched = false;
+  const paint = () => {
+    card.querySelectorAll('[data-st]').forEach(b => b.classList.toggle('active', b.dataset.st === status));
+    const d = dateEl.value, tm = hm(), now = todayStr();
+    const other = target(d), clash = !!other;
+    shown = attSig(other);
+    const notes = [];
+    if (clash) notes.push(`${esc(fmtCn(d))} 已经有他的签到（${esc(attText(other))}），保存后换成这次填的`);
+    if (tm && d === now && tm > nowHM()) notes.push('<span class="as-warn">时间不能晚于现在</span>');
+    if (!has && ateOn(memberId, d)) notes.push('这天他用饭卡打过饭');
+    if (has && a.created_by) notes.push(`${esc(a.created_by)} 签的${a.updated_by && a.updated_by !== a.created_by ? `，${esc(a.updated_by)} 改过` : ''}`);
+    notes.push(`${esc(lateAfter())} 及以后到的算「迟」`);
+    noteEl.innerHTML = notes.join('<br>');
+    okBtn.textContent = clash ? '替换' : has ? '保存' : d === now ? '签到' : '补签';
+  };
+  const onTime = () => { timeTouched = true; const tm = hm(); if (/^\d\d:\d\d$/.test(tm)) status = tm >= lateAfter() ? 'late' : 'present'; paint(); };
+  timeEl.addEventListener('input', onTime);
+  timeEl.addEventListener('change', onTime);
+  dateEl.addEventListener('change', () => {
+    // 新签的、时间还没动过：换到今天就是现在的时间，换到过去的周日就不填（默认准时）
+    if (!has && !timeTouched) {
+      timeEl.value = dateEl.value === todayStr() ? nowHM() : '';
+      status = hm() && hm() >= lateAfter() ? 'late' : 'present';
+    }
+    paint();
+  });
+  pick('#asNoTime').addEventListener('click', () => { timeTouched = true; timeEl.value = ''; paint(); });
+  pick('#asSeg').addEventListener('click', e => { const b = e.target.closest('[data-st]'); if (b) { status = b.dataset.st; paint(); } });
+  pick('#asClear')?.addEventListener('click', () => { ref.close(); clearAttendance(memberId, date, a); });
+  paint();
+
+  function save(close) {
+    const d = dateEl.value, tm = hm(), now = todayStr();
+    if (!d || d > now) { toast('不能给还没到的日子签到'); return; }
+    if (tm && !/^([01]\d|2[0-3]):[0-5]\d$/.test(tm)) { toast('时间要写成 13:32 这样'); return; }
+    if (tm && d === now && tm > nowHM()) { toast('签到时间不能晚于现在'); return; }
+    // 表单开着的时候，另一台手机刚给他在要改到的那天签了到（或者删了）：先让他看清楚再决定替不替换
+    if (attSig(target(d)) !== shown) { paint(); toast(target(d) ? `${m.name} ${fmtCn(d)} 刚被另一台手机签到了（${attText(target(d))}），请再看一下` : '那天的记录刚被另一台手机改了，请再看一下', 3600); return; }
+    close();
+    // 表单开着的时候另一台手机改了他这天的签到：不盖掉别人刚记的，请他再看一下
+    const cur = attOf(memberId, date);
+    if (attSig(cur) !== attSig(a)) { toast(`${m.name} 刚被另一台手机改成「${attText(cur)}」，这次没保存，请再看一下`, 3600); return; }
+    if (has && d === date && tm === time0 && status === a.status) return;       // 什么都没改
+    if (afterSave) afterSave();
+    saveAttendance(memberId, { date: d, time: tm, status, from: has ? date : null, isNew: !has });
+  }
+}
+
+function openLateModal() {
+  showModal({
+    title: '几点以后签到算「迟」？',
+    bodyHtml: `<div class="field-label">这个时间及以后点「签到」的，自动记为「迟」</div>
+      <input id="lateInput" type="time" value="${esc(lateAfter())}" step="60">
+      <div class="stat-note">几台手机共用这个时间。改了只影响之后的签到，已经记好的不变。</div>`,
+    buttons: [
+      { label: '取消', variant: 'btn-ghost', onClick: c => c() },
+      { label: '保存', variant: 'btn-primary', onClick: c => {
+          const v = String($('lateInput').value || '').slice(0, 5);
+          if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(v)) { toast('请选一个时间，比如 13:40'); return; }
+          c();
+          if (v !== lateAfter()) setLateAfter(v);
+        } }
+    ]
+  });
+}
+
+/* ---------- 导出签到表：和纸质「繁星签到表」一样，一人一行、每次聚会一列 ---------- */
+function openAttExport() {
+  const cur = halfOf(todayStr()), prev = halfOf(addDays(cur.from, -1));
+  showModal({
+    title: '导出签到表',
+    bodyHtml: '选一段时间。表的样子和纸质「繁星签到表」一样：一人一行，每次聚会一列，最后是到、迟、缺的次数和出勤率。',
+    buttons: [
+      { label: `这半年（${halfLabel(cur)}）`, variant: 'btn-primary', onClick: c => { c(); exportAttendanceCsv(cur.from, cur.to, halfLabel(cur)); } },
+      { label: `上一个半年（${halfLabel(prev)}）`, variant: 'btn-secondary', onClick: c => { c(); exportAttendanceCsv(prev.from, prev.to, halfLabel(prev)); } },
+      { label: '全部记录', variant: 'btn-secondary', onClick: c => { c(); exportAttendanceCsv('0000-01-01', '9999-12-31', '全部'); } },
+      { label: '取消', variant: 'btn-ghost', onClick: c => c() }
+    ]
+  });
+}
+function exportAttendanceCsv(from, to, label) {
+  const t = todayStr();
+  const dates = meetingDates(from, to);
+  if (!dates.length) { toast('这段时间还没有签到记录', 3200); return; }
+  // 名单：名册里的人 + 这段时间有记录、后来被隐藏的人
+  const had = new Set(); for (const d of dates) for (const id of attOn(d).keys()) had.add(id);
+  const people = [...activeMembers(), ...state.members.filter(m => m.active === false && had.has(m.id)).sort(compareMembers)];
+  const head = ['小组', '姓名', ...dates.map(d => d.replace(/-/g, '/')), '到', '迟', '缺', '出勤率'];
+  const perDate = dates.map(() => ({ present: 0, late: 0, absent: 0 }));
+  const body = people.map(m => {
+    let p = 0, l = 0, ab = 0, counted = 0;
+    const cells = dates.map((d, i) => {
+      const st = attStatusFor(m, d);
+      if (!st) return '';
+      counted++; perDate[i][st]++;
+      if (st === 'present') p++; else if (st === 'late') l++; else ab++;
+      return ATT[st].mark;
+    });
+    return [groupOf(m), m.name + (m.active === false ? '（已隐藏）' : ''), ...cells, p, l, ab, counted ? Math.round((p + l) / counted * 100) + '%' : ''];
+  });
+  const blanks = n => new Array(n).fill('');
+  const foot = [
+    ['', '准时（人）', ...perDate.map(x => x.present), ...blanks(4)],
+    ['', '迟到（人）', ...perDate.map(x => x.late), ...blanks(4)],
+    ['', '缺席（人）', ...perDate.map(x => x.absent), ...blanks(4)],
+    // 那天是谁签的到（用哪个账号记的、改的）
+    ['', '记录人', ...dates.map(d => [...new Set([...attOn(d).values()].flatMap(a => [a.created_by, a.updated_by]).filter(Boolean))].join('、')), ...blanks(4)],
+  ];
+  const title = [`繁星签到表（${label}）`, ...blanks(head.length - 1)];
+  const csv = '﻿' + [title, head, ...body, blanks(head.length), ...foot].map(r => r.map(csvCell).join(',')).join('\r\n');
+  saveCsv(`attendance_${t}.csv`, csv, `已导出 ${people.length} 人、${dates.length} 次聚会的签到`);
+}
+
+/* 名册里点开一个人：最近几次聚会的签到 + 这半年的次数 */
+function attHistoryHtml(m) {
+  const t = todayStr();
+  const dates = meetingDates().reverse();
+  const recent = [];
+  for (const d of dates) { const st = attStatusFor(m, d); if (st) recent.push([d, st]); if (recent.length >= 8) break; }
+  if (!recent.length) return '<div class="list-meta">还没有签到记录</div>';
+  const h = halfOf(t);
+  const c = { present: 0, late: 0, absent: 0 };
+  for (const d of dates) if (d >= h.from && d <= h.to) { const st = attStatusFor(m, d); if (st) c[st]++; }
+  return `<div class="att-hist">${recent.map(([d, st]) => `<span class="att-chip ${ATT[st].cls}">${esc(fmtShort(d))} ${ATT[st].mark}</span>`).join('')}</div>
+    <div class="list-meta" style="margin-top:6px;">这半年：准时 ${c.present} 次 · 迟到 ${c.late} 次 · 缺席 ${c.absent} 次（周日没签到的算缺席）</div>`;
+}
+
+function renderRoster() {
+  const list = activeMembers();
+  let html = `<div class="section-title">全部成员（${list.length}）</div>`;
+  if (!list.length) {
+    html += `<div class="empty-state">还没有成员</div>`;
+  } else {
+    const rowHtml = (m) => {
+      const card = currentCardOf(m.id);
+      const sub = card
+        ? `${card.is_paid ? '已付' : '未付'} · 已用 ${usagesOf(card.id).length}/5 次${card.status === 'EXHAUSTED' ? '（已用完）' : ''}`
+        : '无有效饭卡';
+      const issue = activeCardOf(m.id) ? '' : `<button type="button" class="mini-btn" data-roster-issue="${esc(m.id)}">${card ? '开新卡' : '开卡'}</button>`;
+      return `<div class="roster-row" data-member="${esc(m.id)}">
+        <div><div class="rn">${esc(m.name)}</div><div class="rp">${esc(sub)}</div></div>
+        <div class="roster-right">${issue}<div class="chev">›</div></div>
+      </div>`;
+    };
+    // 分了组就按小组分节，没分组就平铺
+    const groups = groupList();
+    if (groups.length) {
+      for (const g of groups) {
+        const members = list.filter(m => groupOf(m) === g);
+        if (!members.length) continue;
+        html += `<div class="roster-group-head">${esc(g)}（${members.length}）</div>`;
+        html += members.map(rowHtml).join('');
+      }
+      const none = list.filter(m => !groupOf(m));
+      if (none.length) {
+        html += `<div class="roster-group-head">未分组（${none.length}）</div>`;
+        html += none.map(rowHtml).join('');
+      }
+    } else {
+      html += list.map(rowHtml).join('');
+    }
+  }
+  html += `<button class="add-btn" id="addMemberBtn">+ 添加成员</button>
+           <button class="add-btn" id="importBtn" style="margin-top:8px;">↓ 从 Excel 批量导入名单</button>`;
+
+  // 被隐藏的成员收在最下面，随时可以恢复。
+  // 另一台手机一有操作，这一页就会重画——展开着的就保持展开，不然正找人时会突然合上
+  const hidden = state.members.filter(m => m.active === false).sort((a, b) => (a.name || '').localeCompare(b.name || '', 'zh'));
+  const hiddenOpen = !!document.querySelector('.hidden-box')?.open;
+  if (hidden.length) {
+    html += `<details class="hidden-box"${hiddenOpen ? ' open' : ''}><summary>已隐藏的成员（${hidden.length}）</summary>${
+      hidden.map(m => `<div class="list-row"><span>${esc(m.name)} <span class="list-meta">${esc(groupOf(m) || '未分组')}</span></span>
+        <span class="row-btns"><button class="mini-btn" data-restore="${esc(m.id)}">恢复</button><button class="mini-btn danger" data-delete="${esc(m.id)}">删除</button></span></div>`).join('')
+    }</details>`;
+  }
+
+  $('main').dataset.view = 'roster';
+  $('main').innerHTML = html;
+
+  $('importBtn').addEventListener('click', openImportModal);
+  $('addMemberBtn').addEventListener('click', () => openAddMemberModal());
+  document.querySelectorAll('.roster-row').forEach(row =>
+    row.addEventListener('click', e => {
+      const b = e.target.closest('[data-roster-issue]');
+      if (b) { openIssueFlow(b.dataset.rosterIssue); return; }   // 「开卡」：开好就出现在打饭台上
+      openMemberDetail(row.dataset.member);
+    }));
+  document.querySelectorAll('[data-delete]').forEach(b =>
+    b.addEventListener('click', () => askDeleteMember(b.dataset.delete)));
+  document.querySelectorAll('[data-restore]').forEach(b =>
+    b.addEventListener('click', () => {
+      const m = memberById(b.dataset.restore);
+      updateMember(b.dataset.restore, { active: true }, '已恢复 ' + (m?.name || ''));
+    }));
+}
+
+/* checkInDate：从签到页加新朋友，加好马上给他签到（过去的周日：补签，记为准时，点名字可以改） */
+function openAddMemberModal({ checkInDate = null, name = '' } = {}) {
+  const grp0 = checkInDate ? state.attGroup : state.group;
+  const live = checkInDate === todayStr();
+  const modalRef = showModal({
+    title: checkInDate ? `新朋友：加入名册并${live ? '签到' : '补签'}` : '添加成员',
+    bodyHtml: `<div class="field-label">姓名</div><input id="nmName" type="text" placeholder="例如：张三" enterkeyhint="done" value="${esc(name)}">
+               <div class="field-label">小组</div>
+               ${groupPickerHtml(grp0 === '__none__' ? '' : grp0)}
+               <div class="field-label">拼音首字母（不填会自动生成）</div><input id="nmPy" type="text" placeholder="例如：zs" autocapitalize="off" enterkeyhint="done">
+               ${checkInDate ? `<div class="stat-note">${live ? `加好以后马上给他签到（${esc(fmtCn(checkInDate))}）` : `加好以后给他补签 ${esc(fmtCn(checkInDate))}，记为准时（点他的名字可以改时间）`}。名册里也会有他；要留下来吃饭的话，到「名册」给他开卡。</div>` : ''}`,
+    buttons: [
+      { label: '取消', variant: 'btn-ghost', onClick: close => close() },
+      { label: checkInDate ? (live ? '加入并签到' : '加入并补签') : '保存', variant: 'btn-primary', onClick: close => {
+          // 注意：必须在 close() 之前把输入框的值都读出来，关掉弹窗后节点就没了
+          const name = $('nmName').value.trim();
+          const py = $('nmPy').value.trim().toLowerCase();
+          const grp = readGroupPicker(modalRef.card);
+          if (!name) { toast('请输入姓名'); return; }
+          close();
+          const after = !checkInDate ? null
+            : checkInDate === todayStr() ? (m => checkIn(m.id, checkInDate))
+            : (m => {
+                const had = attOf(m.id, checkInDate);   // 「就是他」选的是已经签过的人：不改他原来的记录
+                if (had && had.status !== 'absent') { toast(`${m.name} 这天已经签过了（${attText(had)}），没有改`, 3200); return; }
+                saveAttendance(m.id, { date: checkInDate, status: 'present', isNew: true });
+              });
+          if (after) after.verb = live ? '签到' : '补签';
+          if (!askSameName(name, py, grp, after)) addMember(name, py, grp, false, after);
+        } }
+    ]
+  });
+  bindGroupPicker(modalRef.card);
+  setTimeout(() => $('nmName')?.focus(), 60);
+}
+
+/* ---------- 批量导入名单 ---------- */
+const NAME_HEADS = ['姓名', '名字', '名', 'name', '成员', '人员', '名单'];
+const PINYIN_HEADS = ['拼音', '拼音首字母', 'pinyin'];
+const HEADER_WORDS = [...NAME_HEADS, ...PINYIN_HEADS, '序号', '编号', 'no', 'no.', '#', '小组', '组别', '组', '饭卡', '电话', '备注'];
+const CJK_NAME = /^[㐀-鿿]{2,4}$/;
+
+/* 把粘贴的文字或表格内容解析成 [{name, pinyin}]。能认的格式：
+   一行一个名字；从 Excel 复制的多列（Tab 分隔）；CSV（逗号分隔）；
+   带表头的表格（按表头找「姓名」「拼音」那一列，表头上面的大标题不要）；
+   第一列是序号；微信接龙那种「1. 张三」；一行里用中文逗号、顿号或空格隔开的几个名字。 */
+function parseImportText(text) {
+  const raws = String(text || '').split(/\r?\n/);
+  const lines = raws.map(line =>
+    line.split(line.includes('\t') ? /\t/ : /[,;，、；]/)
+        .map(c => c.trim().replace(/^"(.*)"$/, '$1').replace(/""/g, '"').trim()));
+  // 找表头：前几行里某一格正好是「姓名 / 名字 / …」
+  let start = 0, nameCol = -1, pyCol = -1;
+  const firstRows = [];
+  for (let i = 0; i < lines.length && firstRows.length < 5; i++) if (lines[i].some(Boolean)) firstRows.push(i);
+  const hi = firstRows.find(i => lines[i].some(c => NAME_HEADS.includes(c.toLowerCase())));
+  if (hi !== undefined) {
+    const low = lines[hi].map(c => c.toLowerCase());
+    nameCol = low.findIndex(c => NAME_HEADS.includes(c));
+    pyCol = low.findIndex(c => PINYIN_HEADS.includes(c));
+    start = hi + 1;
+  }
+  const seen = new Set(), out = [];
+  const add = (raw, py) => {
+    const name = String(raw || '').replace(/^\d{1,3}\s*(?:[.．、)）:：-]\s*|\s+)/, '').trim();   // 「1. 张三」「2）李四」
+    if (!name || HEADER_WORDS.includes(name.toLowerCase())) return;   // 空格子、漏网的表头
+    if (/^\d+$/.test(name) || name.length > 20) return;                // 纯数字、太长的都不是名字
+    if (seen.has(name)) return;                                        // 名单里自己重复
+    seen.add(name);
+    // 拼音列：只认像拼音首字母的（可能是「已付」之类的其他内容）
+    const pinyin = /^[a-zA-Z]{1,12}$/.test(py || '') ? py.toLowerCase() : '';
+    out.push({ name, pinyin });
+  };
+  for (let i = start; i < lines.length; i++) {
+    const cells = lines[i];
+    if (!cells.some(Boolean)) continue;
+    if (nameCol >= 0) { add(cells[nameCol], pyCol >= 0 ? cells[pyCol] : ''); continue; }
+    // 手打的「张三，李四、王五」：中文逗号 / 顿号隔开的是一串名字，不是表格的几列
+    if (!raws[i].includes('\t') && /[，、；]/.test(raws[i])) { cells.forEach(c => add(c, '')); continue; }
+    let parts = cells.filter(Boolean);
+    if (/^\d+$/.test(parts[0]) && parts.length > 1) parts = parts.slice(1);   // 第一列是序号：跳过它
+    const words = parts.length === 1 ? parts[0].split(/\s+/) : [];
+    if (words.length > 1 && words.every(w => CJK_NAME.test(w))) { words.forEach(w => add(w, '')); continue; }
+    add(parts[0], parts[1] || '');
+  }
+  return out;
+}
+
+/* 读 Excel / CSV，统一转成「每行用 Tab 分隔」的纯文本，再走同一个解析函数。
+   空格子要留成空位，否则按表头找列会错位。 */
+async function readSheetFile(file) {
+  const buf = await file.arrayBuffer();
+  if (/\.(csv|txt)$/i.test(file.name)) {
+    // 中文 Windows 上 Excel「另存为 CSV」默认是 GBK 编码，直接按 UTF-8 读会变成乱码
+    let text;
+    try { text = new TextDecoder('utf-8', { fatal: true }).decode(buf); }
+    catch { text = new TextDecoder('gb18030').decode(buf); }
+    return text.replace(/^﻿/, '');
+  }
+  const XLSX = await import('https://cdn.jsdelivr.net/npm/xlsx@0.18.5/+esm');
+  const wb = XLSX.read(buf, { type: 'array' });
+  const sheet = wb.Sheets[wb.SheetNames[0]];
+  const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, blankrows: false, defval: '' });
+  return rows
+    .map(r => Array.from(r || [], c => (c == null ? '' : String(c).replace(/[\t\r\n]+/g, ' ').trim())).join('\t'))
+    .filter(line => line.replace(/\t/g, '').trim())
+    .join('\n');
+}
+
+/* 解析 + 查重 + 补拼音，预览和真正导入都用它（导入时现算，不依赖预览是否来得及刷新） */
+async function prepareImport(text) {
+  const rows = parseImportText(text);
+  const byName = new Map();
+  for (const m of state.members) { const a = byName.get(m.name) || []; a.push(m); byName.set(m.name, a); }
+  for (const r of rows) {
+    const same = byName.get(r.name) || [];
+    const vis = same.find(m => m.active !== false), hid = same.find(m => m.active === false);
+    r.kind = vis ? 'dup' : hid ? 'restore' : 'new';
+    if (hid && !vis) r.memberId = hid.id;
+  }
+  let auto = false;
+  for (const r of rows.filter(x => x.kind === 'new' && !x.pinyin)) { r.pinyin = await pinyinOf(r.name); auto = auto || !!r.pinyin; }
+  return { rows, auto };
+}
+
+function openImportModal() {
+  let busy = false;
+  const modalRef = showModal({
+    title: '批量导入成员',
+    bodyHtml: `
+      <div class="field-label">这批人属于哪个小组</div>
+      ${groupPickerHtml(state.group === '__none__' ? '' : state.group)}
+      <div class="imp-hint" style="margin-top:6px;">
+        一个小组导一次最方便：先点上面的组号，再把这组人的名字粘进来。<br>
+        在 Excel 里选中姓名那一列 → 复制 → 粘贴到下面，一行一个人。<br>
+        想同时带上拼音就复制两列（姓名、拼音）；不带也行，会自动生成。
+      </div>
+      <textarea id="impText" rows="6" placeholder="张三&#10;李四&#10;王五"></textarea>
+      <div class="imp-or">或者直接选文件</div>
+      <input id="impFile" type="file" accept=".xlsx,.xls,.csv,.txt">
+      <div class="imp-preview" id="impPreview"></div>`,
+    buttons: [
+      { label: '取消', variant: 'btn-ghost', onClick: close => close() },
+      { label: '导入', variant: 'btn-primary', onClick: async close => {
+          if (busy) return;
+          const text = $('impText')?.value || '';
+          const grp = readGroupPicker(modalRef.card);   // 必须在 close() 之前读
+          busy = true;
+          const { rows } = await prepareImport(text);
+          busy = false;
+          const todo = rows.filter(r => r.kind !== 'dup');
+          if (!rows.length) { toast('还没有可导入的名单'); return; }
+          if (!todo.length) { toast('这些人都已经在名册里了'); return; }
+          close();
+          await bulkAddMembers(todo, grp);
+        } }
+    ]
+  });
+
+  bindGroupPicker(modalRef.card);
+  const preview = $('impPreview');
+  let seq = 0;
+
+  async function refresh(text) {
+    const my = ++seq;
+    if (!parseImportText(text).length) { preview.innerHTML = ''; return; }
+    preview.innerHTML = `<div style="color:var(--ink-soft);">正在整理名单…</div>`;
+    const { rows, auto } = await prepareImport(text);
+    if (my !== seq || !document.body.contains(preview)) return;     // 已经有更新的输入了
+    const add = rows.filter(r => r.kind === 'new'), back = rows.filter(r => r.kind === 'restore'), dup = rows.filter(r => r.kind === 'dup');
+    preview.innerHTML =
+      `<div><strong>将添加 ${add.length} 人</strong>${back.length ? `，恢复 ${back.length} 个之前隐藏的` : ''}${dup.length ? `，跳过 ${dup.length} 个已存在的` : ''}${auto ? '，拼音已自动生成' : ''}</div>
+       <div class="imp-names">${rows.map(r =>
+         `<span class="imp-chip${r.kind === 'dup' ? ' dup' : ''}">${esc(r.name)}${r.kind === 'restore' ? ' <span style="opacity:.6">恢复</span>' : r.pinyin && r.kind === 'new' ? ` <span style="opacity:.6">${esc(r.pinyin)}</span>` : ''}</span>`
+       ).join('')}</div>`;
+  }
+
+  let t = null;
+  $('impText').addEventListener('input', e => {
+    const v = e.target.value;
+    if (t) clearTimeout(t);
+    t = setTimeout(() => refresh(v), 250);
+  });
+
+  $('impFile').addEventListener('change', async e => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    preview.innerHTML = `<div style="color:var(--ink-soft);">正在读取 ${esc(file.name)}…</div>`;
+    try {
+      const text = await readSheetFile(file);
+      const box = $('impText');
+      if (box) box.value = text;
+      await refresh(text);
+    } catch (err) {
+      console.error(err);
+      preview.innerHTML = `<div style="color:var(--brick);">这个文件读不了。请在 Excel 里另存为 CSV 再试，或者直接把姓名那一列复制粘贴到上面的框里。</div>`;
+    }
+  });
+}
+
+async function bulkAddMembers(rows, groupName) {
+  const fresh = rows.filter(r => r.kind === 'new').map(r => ({ id: uuid(), name: r.name, pinyin: r.pinyin || '', group_name: groupName || '' }));
+  const back = rows.filter(r => r.kind === 'restore');
+  state.pendingOps++; writeSeq++;
+  try {
+    if (fresh.length) {
+      const saved = await withRetry(async () => must(await sb.from('members').upsert(fresh, { onConflict: 'id', ignoreDuplicates: true }).select()));
+      for (const r of saved || []) upsertRow('members', r);
+      if ((saved || []).length < fresh.length) fullReload();   // 重发时有些已经存在：以数据库为准再核对一遍
+    }
+    for (const r of back) {
+      upsertRow('members', await updateRow('members', r.memberId, { active: true, ...(groupName ? { group_name: groupName } : {}) }));
+    }
+    if (groupName) state.group = groupName;   // 导完直接跳到这个小组，方便核对
+    render();
+    toast(`已导入 ${fresh.length} 位${back.length ? `，恢复 ${back.length} 位` : ''}${groupName ? '到「' + groupName + '」' : ''}`, 3200);
+  } catch (e) {
+    toast(friendly(e, '导入失败'), 4200);
+    fullReload();
+  } finally { state.pendingOps--; }
+}
+
+function openMemberDetail(memberId) {
+  const m = memberById(memberId);
+  if (!m) return;
+  const cards = cardsOf(memberId);
+  const history = cards.length === 0
+    ? `<div style="color:var(--ink-soft);font-size:13px;">暂无饭卡记录</div>`
+    : cards.map(c => {
+        const label = c.status === 'ACTIVE' ? '使用中' : (c.status === 'EXHAUSTED' ? '已用完' : '已作废');
+        const opened = fmtDate(toDate(c.created_at));
+        const paidDay = c.paid_at ? fmtDate(toDate(c.paid_at)) : '';
+        const pay = !c.is_paid ? '未付款' : (paidDay && paidDay !== opened ? `${fmtShort(paidDay)} 补交20欧` : '已付20欧');
+        return `<div class="list-row"><span>${esc(opened)} · ${pay}</span><span class="list-meta">${label} ${usagesOf(c.id).length}/5</span></div>`;
+      }).join('');
+
+  // 打开时的样子：保存时只把真正改了的那几项送出去（另一台手机这期间改了别的，不会被盖回去）
+  const init = { name: m.name, pinyin: m.pinyin || '', group: groupOf(m) };
+  const modalRef = showModal({
+    title: m.name,
+    bodyHtml: `<div class="field-label">姓名</div><input id="edName" type="text" maxlength="40" value="${esc(m.name)}" autocomplete="off" enterkeyhint="done">
+               <div class="field-label">小组</div>
+               ${groupPickerHtml(groupOf(m))}
+               <div class="field-label">拼音首字母（改了名字会跟着重新生成）</div><input id="edPy" type="text" value="${esc(m.pinyin || '')}" autocapitalize="off" enterkeyhint="done">
+               <div class="section-title" style="margin-top:16px;">饭卡历史</div>${history}
+               <div class="section-title" style="margin-top:16px;">最近签到</div>${attHistoryHtml(m)}
+               <div class="section-title" style="margin-top:16px;">修改记录</div><div id="mHist" class="m-hist"><div class="list-meta">加载中…</div></div>
+               <button type="button" class="link-danger" id="delMemberBtn">删除这个人…</button>`,
+    buttons: [
+      { label: '保存', variant: 'btn-primary', onClick: close => {
+          const norm = v => String(v || '').replace(/[\s\u3000]+/g, ' ').trim();     // 多个空格、全角空格都算一个空格
+          const name = norm($('edName').value);
+          const pyIn = $('edPy').value.trim().toLowerCase();
+          const grp = readGroupPicker(modalRef.card);
+          if (!name) { toast('姓名不能是空的'); return; }
+          const renamed = name !== norm(init.name);           // 没动名字：原来的写法原样保留，不算改名
+          const save = async () => {
+            close();
+            let py = pyIn;
+            if (renamed && py === init.pinyin.toLowerCase()) {
+              // 拼音还是旧名字的（没手动改过）：跟着新名字重新生成；新名字不是中文的就空着；没网生成不了先留着旧的
+              const p = /[一-龥]/.test(name) ? await pinyinOf(name) : '';
+              if (p || !/[一-龥]/.test(name)) py = p;
+            } else if (!py) py = await pinyinOf(renamed ? name : m.name);
+            const patch = {};
+            if (renamed) patch.name = name;
+            if (grp !== init.group) patch.group_name = grp;
+            if (py !== init.pinyin) patch.pinyin = py;
+            if (!Object.keys(patch).length) { toast('没有改动'); return; }
+            updateMember(memberId, patch, renamed ? `已改名：${init.name} → ${name}` : '已保存');
+          };
+          const same = renamed && state.members.find(x => x.id !== memberId && x.name === name);
+          if (!same) return save();
+          showModal({
+            title: `名册里已经有「${name}」了`,
+            bodyHtml: `已有的那位在 <strong>${esc(groupOf(same) || '未分组')}</strong>${same.active === false ? '（已隐藏）' : ''}。确定也改叫「${esc(name)}」吗？打饭台、签到上会有两个同名的人。`,
+            buttons: [{ label: '不改了', variant: 'btn-ghost', onClick: c => c() },
+                      { label: '仍然改名', variant: 'btn-primary', onClick: c => { c(); save(); } }]
+          });
+        } },
+      { label: '开通新5次卡', variant: 'btn-secondary', onClick: close => { close(); openIssueFlow(memberId); } },
+      { label: '隐藏该成员', variant: 'btn-ghost', onClick: close => { close(); updateMember(memberId, { active: false }, `已隐藏 ${m.name}（名册最下面可以恢复）`); } }
+    ]
+  });
+  modalRef.card.querySelector('#delMemberBtn').addEventListener('click', () => { modalRef.close(); askDeleteMember(memberId); });
+  bindGroupPicker(modalRef.card);
+  loadMemberHistory(memberId, modalRef.card.querySelector('#mHist'));
+}
+
+/* ---------- Tab 3 财务 ---------- */
+/* ---------- 钱的显示与「收支算账」的时间段 ---------- */
+function eur(n) {
+  const v = Math.round((Number(n) || 0) * 100) / 100;
+  const abs = Math.abs(v), txt = Number.isInteger(abs) ? String(abs) : abs.toFixed(2);
+  return (v < 0 ? '−€' : '€') + txt;
+}
+const PERIODS = [['month', '本月'], ['lastMonth', '上月'], ['year', '今年'], ['all', '全部']];
+function periodRange(p) {
+  const [y, m] = todayStr().split('-').map(Number);
+  const pad = n => String(n).padStart(2, '0');
+  if (p === 'month') return { from: `${y}-${pad(m)}-01`, to: `${y}-${pad(m)}-31` };
+  if (p === 'lastMonth') { const ly = m === 1 ? y - 1 : y, lm = m === 1 ? 12 : m - 1; return { from: `${ly}-${pad(lm)}-01`, to: `${ly}-${pad(lm)}-31` }; }
+  if (p === 'year') return { from: `${y}-01-01`, to: `${y}-12-31` };
+  return { from: '0000-01-01', to: '9999-12-31' };
+}
+const inRange = (d, r) => !!d && d >= r.from && d <= r.to;
+/* 某段时间的收支：卡费按实际收钱那天算，散客按记录那天，支出按支出那天 */
+function ledger(r) {
+  const paidCards = state.cards.filter(c => c.is_paid && c.paid_at && inRange(fmtDate(toDate(c.paid_at)), r)).length;
+  const cash = state.cashLogs.filter(l => inRange(l.log_date, r));
+  const cashSum = cash.reduce((s, l) => s + (Number(l.amount) || 0), 0);
+  const exps = state.expenses.filter(x => inRange(x.spent_date, r))
+    .sort((a, b) => (a.spent_date < b.spent_date ? 1 : a.spent_date > b.spent_date ? -1 : toDate(b.created_at) - toDate(a.created_at)));
+  const expSum = exps.reduce((s, x) => s + (Number(x.amount) || 0), 0);
+  const income = paidCards * 20 + cashSum;
+  return { paidCards, cashCount: cash.length, cashSum, income, exps, expSum, balance: income - expSum };
+}
+
+function renderFinance() {
+  const today = todayStr();
+  // 看板看「最近一次聚会」：今天是周日、或者今天有收支，就看今天；不然看上一个周日（周一打开不会是一排 0）
+  const paidOn = c => c.is_paid && c.paid_at ? fmtDate(toDate(c.paid_at)) : '';
+  const busy = d => state.usages.some(u => u.used_date === d) || state.cashLogs.some(l => l.log_date === d)
+    || state.expenses.some(x => x.spent_date === d) || state.cards.some(c => paidOn(c) === d);
+  const day = weekdayOf(today) === 0 || busy(today) ? today : latestSunday(today);
+  const isToday = day === today, D = isToday ? '今日' : '当天';
+
+  const todayPunches = state.usages.filter(u => u.used_date === day).length;
+  const todayCash = state.cashLogs.filter(l => l.log_date === day);
+  // 这天实际收到的卡费：按「收款时间」算——上周开卡、今天补交的 20 欧也算今天的
+  const todayPaidCards = state.cards.filter(c => paidOn(c) === day).length;
+  const revenue = todayCash.length * 4 + todayPaidCards * 20;
+  const todayExp = state.expenses.filter(x => x.spent_date === day).reduce((s, x) => s + (Number(x.amount) || 0), 0);
+
+  const counts = {};
+  state.usages.forEach(u => { counts[u.used_date] = (counts[u.used_date] || 0) + 1; });
+  state.cashLogs.forEach(l => { counts[l.log_date] = (counts[l.log_date] || 0) + 1; });
+  const dates = Object.keys(counts).sort().slice(-8);
+  const max = Math.max(1, ...dates.map(d => counts[d]));
+
+  const bars = dates.map(d =>
+    `<div class="bar-wrap"><div class="bar-count">${counts[d]}</div><div class="bar" style="height:${Math.max(4, Math.round(counts[d] / max * 100))}%"></div><div class="bar-label">${esc(fmtShort(d))}</div></div>`
+  ).join('');
+
+  const cashRows = todayCash.length === 0
+    ? `<div style="color:var(--ink-soft);font-size:13px;padding:8px 2px;">${isToday ? '今天还没有散客记录' : '当天没有散客记录'}</div>`
+    : todayCash
+        .slice()
+        .sort((a, b) => toDate(a.created_at) - toDate(b.created_at))
+        .map(l => `<div class="list-row">
+            <span>散客 4欧 <span class="list-meta">${esc(fmtTime(toDate(l.created_at)))}${recBy(l) ? ' · ' + esc(recBy(l)) : ''}</span></span>
+            <button class="icon-btn" data-del-cash="${esc(l.id)}" aria-label="删除这笔">×</button>
+          </div>`).join('');
+
+  const owing = state.cards.filter(c => !c.is_paid && c.status !== 'ARCHIVED');
+  const owingRows = owing.length === 0
+    ? `<div style="color:var(--ink-soft);font-size:13px;padding:8px 2px;">没有待收款的饭卡</div>`
+    : owing.map(c => `<div class="list-row">
+        <span>${esc(memberById(c.member_id)?.name || '(已删除)')} <span class="list-meta">${esc(fmtDate(toDate(c.created_at)))} 开卡 · 欠 20欧</span></span>
+        <button class="mini-btn" data-mark-paid="${esc(c.id)}">标记已收</button>
+      </div>`).join('');
+
+  // 收支算账：选一段时间，看收入、支出、结余
+  const L = ledger(periodRange(state.finPeriod));
+  const periodChips = PERIODS.map(([k, label]) =>
+    `<button class="group-chip${state.finPeriod === k ? ' active' : ''}" data-period="${k}">${label}</button>`).join('');
+  const expRows = L.exps.length === 0
+    ? `<div style="color:var(--ink-soft);font-size:13px;padding:8px 2px;">这段时间还没有支出</div>`
+    : L.exps.map(x => `<div class="list-row">
+        <span>${esc(fmtShort(x.spent_date))} ${esc(x.purpose || '（没写用途）')}${x.handler ? ` <span class="list-meta">· ${esc(x.handler)}</span>` : ''}${recBy(x) ? ` <span class="list-meta">· ${esc(recBy(x))} 记</span>` : ''}</span>
+        <span class="row-btns"><span class="exp-amt">${esc(eur(-(Number(x.amount) || 0)))}</span><button class="icon-btn" data-del-exp="${esc(x.id)}" aria-label="删除这笔支出">×</button></span>
+      </div>`).join('');
+
+  $('main').dataset.view = 'finance';
+  $('main').innerHTML = `
+    <div class="section-title">${isToday ? '今日看板' : `${esc(fmtCn(day))} 看板`}</div>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-value">${todayPunches + todayCash.length}</div><div class="stat-label">${D}就餐人次</div></div>
+      <div class="stat-card"><div class="stat-value">${todayCash.length}</div><div class="stat-label">其中现金 4欧</div></div>
+      <div class="stat-card"><div class="stat-value">€${revenue}</div><div class="stat-label">${D}应收</div></div>
+    </div>
+    <div class="stat-note">${D}应收 = 散客 4€ × ${todayCash.length} ＋ ${isToday ? '今天' : '当天'}收到的卡费 20€ × ${todayPaidCards}（含补交）${todayExp ? `<br>${isToday ? '今天' : '当天'}另有支出 ${esc(eur(todayExp))}，见下方「收支算账」` : ''}</div>
+
+    <div class="section-title">${D}散客流水</div>
+    ${cashRows}
+
+    <div class="section-title">待收款饭卡（${owing.length}）</div>
+    ${owingRows}
+
+    <div class="section-title">收支算账</div>
+    <div class="group-bar period-bar">${periodChips}</div>
+    <div class="ledger">
+      <div class="ledger-row"><span>收入</span><strong>${esc(eur(L.income))}</strong></div>
+      <div class="ledger-sub">卡费 20€ × ${L.paidCards} = ${esc(eur(L.paidCards * 20))}　·　散客 ${L.cashCount} 笔 = ${esc(eur(L.cashSum))}</div>
+      <div class="ledger-row"><span>支出</span><strong>${esc(eur(-L.expSum))}</strong></div>
+      <div class="ledger-row total"><span>结余</span><strong class="${L.balance < 0 ? 'neg' : ''}">${esc(eur(L.balance))}</strong></div>
+    </div>
+    <button class="add-btn" id="addExpenseBtn" style="margin-top:10px;">+ 记一笔支出</button>
+    ${expRows}
+
+    ${dates.length ? `<div class="section-title">近期就餐人数</div><div class="chart"><div class="bars">${bars}</div></div>` : ''}
+
+    <button class="export-btn" id="exportBtn">导出全部明细 (CSV)</button>
+    <div style="text-align:center;color:var(--ink-soft);font-size:12px;margin-top:8px;line-height:1.6;">
+      用 Excel 打开就是「繁星打饭系统收入支出记录」表：一笔一行；<br>支出记为负数（姓名写经手人），Amount 一列加起来就是结余；<br>最后一列 Recorded_By 是谁记的
+    </div>
+
+    <div class="section-title">登录账号</div>
+    <div class="list-row">
+      <span>${isShared() ? '共用账号 <span class="list-meta">大家用同一个密码登录，记成 admin</span>' : `${esc(myName() || myUser())} <span class="list-meta">${esc(state.user?.email || '')}</span>`}</span>
+      <span class="row-btns">${isShared() ? '' : '<button class="mini-btn" id="myNameBtn">改名字</button>'}<button class="mini-btn" id="changePwBtn">修改密码</button></span>
+    </div>
+    ${canSuggestInstall() ? `<div class="section-title">手机上用</div>
+    <div class="list-row">
+      <span>放到手机主屏幕 <span class="list-meta">像 App 一样全屏打开</span></span>
+      <button class="mini-btn" id="installHelpBtn">怎么加</button>
+    </div>` : ''}`;
+
+  document.querySelectorAll('[data-del-cash]').forEach(b =>
+    b.addEventListener('click', () => {
+      const l = state.cashLogs.find(x => x.id === b.dataset.delCash);
+      if (!l) return;
+      showModal({
+        title: '删除这笔散客记录？',
+        bodyHtml: `${isToday ? '' : esc(fmtCn(l.log_date)) + ' '}${esc(fmtTime(toDate(l.created_at)))} 记的这笔 4 欧。删除后${D}应收会减少 4 欧。`,
+        buttons: [
+          { label: '不删', variant: 'btn-ghost', onClick: close => close() },
+          { label: '删除', variant: 'btn-danger', onClick: close => { close(); deleteCashLog(l.id); } }
+        ]
+      });
+    }));
+  document.querySelectorAll('[data-mark-paid]').forEach(b =>
+    b.addEventListener('click', () => setPaid(b.dataset.markPaid, true)));
+  document.querySelectorAll('[data-period]').forEach(b =>
+    b.addEventListener('click', () => { state.finPeriod = b.dataset.period; render(); }));
+  document.querySelectorAll('[data-del-exp]').forEach(b =>
+    b.addEventListener('click', () => askDeleteExpense(b.dataset.delExp)));
+  $('addExpenseBtn').addEventListener('click', openExpenseModal);
+  $('exportBtn').addEventListener('click', exportCsv);
+  $('changePwBtn').addEventListener('click', openChangePasswordModal);
+  if ($('myNameBtn')) $('myNameBtn').addEventListener('click', () => askMyName(true));
+  if ($('installHelpBtn')) $('installHelpBtn').addEventListener('click', openInstallHelp);
+}
+
+/* ---------- 支出 ---------- */
+const HANDLER_KEY = 'mealcard.handler';
+function lastHandler() { try { return localStorage.getItem(HANDLER_KEY) || ''; } catch { return ''; } }
+function openExpenseModal() {
+  const modalRef = showModal({
+    title: '记一笔支出',
+    bodyHtml: `<div class="field-label">金额（欧）</div>
+      <input id="exAmount" type="text" inputmode="decimal" placeholder="例如：35.50" autocomplete="off">
+      <div class="field-label">用途</div>
+      <input id="exPurpose" type="text" maxlength="200" placeholder="例如：买米、饮料、一次性餐具" autocomplete="off">
+      <div class="field-label">日期</div>
+      <input id="exDate" type="date" value="${esc(todayStr())}">
+      <div class="field-label">经手人（谁付的钱，选填）</div>
+      <input id="exHandler" type="text" maxlength="50" value="${esc(lastHandler())}" placeholder="例如：小明垫付" autocomplete="off">`,
+    buttons: [
+      { label: '取消', variant: 'btn-ghost', onClick: close => close() },
+      { label: '保存', variant: 'btn-primary', onClick: close => {
+          const raw = String($('exAmount').value || '').trim().replace(/^€\s*/, '').replace(/\s*€$/, '').replace(',', '.');
+          const amount = Math.round(Number(raw) * 100) / 100;
+          const purpose = $('exPurpose').value.trim();
+          const date = $('exDate').value;
+          const handler = $('exHandler').value.trim();
+          if (!raw || !Number.isFinite(amount) || amount <= 0) { toast('请填写金额（比如 35.50）'); return; }
+          if (amount >= 100000) { toast('金额太大了，请检查一下'); return; }
+          if (!purpose) { toast('请写一下用途，方便以后算账'); return; }
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) { toast('请选择日期'); return; }
+          close();
+          addExpense({ amount, purpose, date, handler });
+        } }
+    ]
+  });
+  setTimeout(() => $('exAmount')?.focus(), 60);
+  return modalRef;
+}
+
+async function addExpense({ amount, purpose, date, handler }) {
+  try { localStorage.setItem(HANDLER_KEY, handler); } catch {}
+  const row = { id: uuid(), spent_date: date, amount, purpose, handler, operator: state.user?.email || null, created_at: new Date().toISOString(), _pending: true };
+  // 记的日期不在当前看的时间段里：切到「全部」，不然刚记的这笔看不到
+  if (!inRange(date, periodRange(state.finPeriod))) state.finPeriod = 'all';
+  const ok = await optimistic(
+    () => upsertRow('expenses', row),
+    () => removeRow('expenses', row.id),
+    async () => upsertRow('expenses', await insertRow('expenses', { id: row.id, spent_date: date, amount, purpose, handler, operator: row.operator }))
+  );
+  if (ok) toast(`已记一笔支出 ${eur(amount)}（${fmtShort(date)} ${purpose}）`);
+}
+
+function askDeleteExpense(id) {
+  const x = state.expenses.find(e => e.id === id);
+  if (!x) return;
+  showModal({
+    title: '删除这笔支出？',
+    bodyHtml: `${esc(x.spent_date)} ${esc(x.purpose || '')}${x.handler ? '（' + esc(x.handler) + '）' : ''}，<strong>${esc(eur(Number(x.amount) || 0))}</strong>。删除后结余会跟着变。`,
+    buttons: [
+      { label: '不删', variant: 'btn-ghost', onClick: close => close() },
+      { label: '删除', variant: 'btn-danger', onClick: close => { close(); deleteExpense(id); } }
+    ]
+  });
+}
+async function deleteExpense(id) {
+  const backup = state.expenses.find(e => e.id === id);
+  if (!backup) return;
+  const ok = await optimistic(
+    () => removeRow('expenses', id),
+    () => upsertRow('expenses', backup),
+    () => deleteRow('expenses', id)
+  );
+  if (ok) toast('已删除这笔支出');
+}
+
+/* ---------- 修改登录密码 ---------- */
+function openChangePasswordModal() {
+  showModal({
+    title: '修改登录密码',
+    bodyHtml: `<div class="field-label">现在的密码</div>
+      <input id="pwOld" type="password" autocomplete="current-password">
+      <div class="field-label">新密码（至少 8 位）</div>
+      <input id="pwNew" type="password" autocomplete="new-password">
+      <div class="field-label">再输一次新密码</div>
+      <input id="pwNew2" type="password" autocomplete="new-password">
+      <div class="imp-hint" style="margin-top:10px;">改好后，其他所有手机都会被退出（最迟一小时内），要用新密码重新登录。这台手机不用重新登录。</div>`,
+    buttons: [
+      { label: '取消', variant: 'btn-ghost', onClick: close => close() },
+      { label: '修改', variant: 'btn-primary', onClick: close => {
+          const oldPw = $('pwOld').value, pw1 = $('pwNew').value, pw2 = $('pwNew2').value;
+          if (!oldPw) { toast('请输入现在的密码'); return; }
+          if (pw1.length < 8) { toast('新密码至少要 8 位'); return; }
+          if (pw1 !== pw2) { toast('两次输入的新密码不一样'); return; }
+          if (pw1 === oldPw) { toast('新密码和现在的一样'); return; }
+          close();
+          changePassword(oldPw, pw1);
+        } }
+    ]
+  });
+  setTimeout(() => $('pwOld')?.focus(), 60);
+}
+async function changePassword(oldPw, newPw) {
+  const email = state.user?.email;
+  try {
+    // 先确认现在的密码：别人拿着没锁屏的手机也不能随手把密码改掉
+    const chk = await sb.auth.signInWithPassword({ email, password: oldPw });
+    if (chk.error) throw chk.error;
+    const up = await sb.auth.updateUser({ password: newPw });
+    if (up.error) throw up.error;
+    await sb.auth.signOut({ scope: 'others' });           // 其他设备的登录全部作废
+    toast('密码已改好。其他手机要用新密码重新登录', 4200);
+  } catch (e) {
+    const code = e?.code || '', m = String(e?.message || '');
+    if (code === 'invalid_credentials' || /Invalid login/i.test(m)) toast('现在的密码不对，密码没有改', 4200);
+    else if (code === 'weak_password' || /weak|at least/i.test(m)) toast('新密码太简单了，请换一个更长的', 4200);
+    else if (code === 'same_password' || /different from the old/i.test(m)) toast('新密码和现在的一样', 4200);
+    else if (code === 'reauthentication_needed' || /reauthenticat/i.test(m)) toast('Supabase 要求重新验证：请先退出、重新登录，然后马上修改', 5000);
+    else if (code === 'over_request_rate_limit' || e?.status === 429) toast('尝试次数太多了，请过几分钟再试', 4200);
+    else toast(friendly(e, '修改密码失败'), 4200);
+  }
+}
+
+/* 现在是在哪儿打开的：主屏幕图标 / iPhone / 安卓 / 微信里 */
+function platformInfo() {
+  const ua = navigator.userAgent || '';
+  const standalone = navigator.standalone === true || !!(window.matchMedia && matchMedia('(display-mode: standalone)').matches);
+  const ios = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  return { standalone, ios, android: /Android/i.test(ua), wechat: /MicroMessenger/i.test(ua) };
+}
+function isIOSHomeScreenApp() { const p = platformInfo(); return p.standalone && p.ios; }
+/* 手机上、而且还不是从主屏幕图标打开的，才提示「加到主屏幕」 */
+function canSuggestInstall() { const p = platformInfo(); return !p.standalone && (p.ios || p.android); }
+
+function openInstallHelp() {
+  const p = platformInfo();
+  const iosSteps = [
+    '用 <b>Safari</b> 打开这个网址。',
+    '点「分享」按钮（方框加向上的箭头，西语 Compartir）。iOS 26 及以后的系统要先点地址栏旁边的「···」，再点「分享」。',
+    '往下滑，点「添加到主屏幕」（Añadir a pantalla de inicio）。',
+    '「作为网页 App 打开」的开关保持打开（默认就是开的），再点「添加」。',
+  ];
+  const androidSteps = [
+    '用 <b>Chrome</b> 打开这个网址。',
+    '点右上角的「⋮」。',
+    '点「添加到主屏幕」或「安装应用」（Añadir a pantalla de inicio / Instalar aplicación），再点「添加」或「安装」。',
+  ];
+  let steps = p.android ? androidSteps : iosSteps;
+  if (p.wechat) steps = [`现在是在<b>微信</b>里打开的，微信里加不了：先点右上角「···」，选「在默认浏览器中打开」${p.ios ? '（或「在 Safari 中打开」）' : ''}。`, ...steps.slice(1)];
+  showModal({
+    title: '加到手机主屏幕',
+    bodyHtml: `<ol class="install-steps">${steps.map(s => `<li>${s}</li>`).join('')}</ol>
+      <div class="install-note">以后点主屏幕上的「繁星团契管理系统」图标打开，全屏显示，用起来像 App。<br>
+      <b>第一次从图标打开，要再输一次密码</b>（图标和浏览器各记各的登录），之后就一直记住。</div>`,
+    buttons: [{ label: '知道了', variant: 'btn-primary', onClick: close => close() }]
+  });
+}
+
+/* CSV 单元格：防止名字以 = + - @ 开头时被 Excel 当成公式执行 */
+function csvCell(v) {
+  let s = String(v ?? '');
+  // 单独一个「-」（散客、支出那一列的占位）不是公式，不用加引号
+  if (/^[=+\-@\t\r]/.test(s) && !/^-?\d+(\.\d+)?$/.test(s) && s !== '-') s = "'" + s;
+  return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
+/* 导出格式照团契自己设计的模板：第 1 行标题，第 2 行表头，下面一笔一行，日期写成 2026/09/30。
+   支出那一行：姓名一栏写经手人（没填就写 -），备注写用途，金额记负数 —— Amount 整列加起来就是结余 */
+const CSV_TITLE = '繁星打饭系统收入支出记录';
+const CSV_HEAD = ['Date', 'Member_Name', 'Group', 'Type', 'Amount', 'Note', 'Recorded_By'];
+/* 谁记的：第 8 版以后由数据库写；以前的散客、支出只有登录邮箱，取 @ 前面那段 */
+const recBy = r => r.created_by || (r.operator ? String(r.operator).split('@')[0] : '');
+function exportCsv() {
+  const rows = [];
+  for (const c of state.cards) {
+    const m = memberById(c.member_id);
+    // 购卡记在「实际收钱」那天：上周开卡、今天补交的，算今天
+    if (c.is_paid) rows.push([fmtDate(toDate(c.paid_at || c.created_at)), m?.name || '(已删除成员)', groupOf(m), '购卡', 20, '', c.paid_by || c.created_by || '']);
+  }
+  for (const u of state.usages) {
+    if (u._pending) continue;
+    const m = memberById(u.member_id);
+    rows.push([u.used_date, m?.name || '(已删除成员)', groupOf(m), '用卡', 0, '', u.created_by || '']);
+  }
+  for (const l of state.cashLogs) {
+    if (l._pending) continue;
+    rows.push([l.log_date, '-', '', '现金', Number(l.amount) || 4, '', recBy(l)]);
+  }
+  for (const x of state.expenses) {
+    if (x._pending) continue;
+    rows.push([x.spent_date, String(x.handler || '').trim() || '-', '', '支出', -(Math.round((Number(x.amount) || 0) * 100) / 100), x.purpose || '', recBy(x)]);
+  }
+  // 先按日期排好（同一天里：购卡 → 用卡 → 现金 → 支出），再把 2026-09-30 写成 2026/09/30
+  const body = rows.sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0))
+    .map(r => [String(r[0] || '').replace(/-/g, '/'), ...r.slice(1)]);
+  const title = [CSV_TITLE, ...CSV_HEAD.slice(1).map(() => '')];
+  const csv = '﻿' + [title, CSV_HEAD, ...body].map(r => r.map(csvCell).join(',')).join('\r\n');
+
+  saveCsv(`mealcard_${todayStr()}.csv`, csv, '已导出 ' + body.length + ' 条记录');
+}
+
+/* 把 CSV 交给用户：一般是下载；iPhone 上「加到主屏幕」的 App 里改走系统「分享」面板——
+   普通下载在那里会打开一个没有返回键的预览页，只能强退 App。分享面板可以存到「文件」、发微信、AirDrop、发邮件。
+   要在点按钮的同一刻调用（中间不能等网络），iPhone 才肯弹出分享面板。 */
+function saveCsv(name, csv, doneMsg) {
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  if (isIOSHomeScreenApp()) {
+    const file = new File([blob], name, { type: 'text/csv' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({ files: [file], title: name }).then(
+        () => toast(doneMsg),
+        err => { if (err && err.name === 'AbortError') return; toast('没能打开分享面板，请再点一次「导出」', 3600); });
+      return;
+    }
+  }
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  // 文件名用英文：部分浏览器会丢掉中文文件名，导出成没有扩展名的 "download"
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  // 不要马上移除：部分浏览器会因此丢掉文件名
+  setTimeout(() => { a.remove(); URL.revokeObjectURL(url); }, 3000);
+  toast(doneMsg);
+}
+
+/* ============================================================
+   登录 / 配置检查 / 出错页
+   ============================================================ */
+function renderSetupNeeded() {
+  $('app').innerHTML = `<div class="gate">
+    <span class="sym-logo gate-logo" role="img" aria-label="SYM"></span>
+    <h1>还差一步配置</h1>
+    <p>这个页面需要连上你自己的 Supabase 数据库才能用。打开项目文件夹里的 <strong>config.js</strong>，把下面两项填好再重新上传：</p>
+    <code>SUPABASE_URL: "https://xxxxx.supabase.co"
+SUPABASE_ANON_KEY: "sb_publishable_…（或以 eyJ 开头的 anon 密钥）"</code>
+    <p>两项都在 Supabase 后台 → Project Settings → API Keys 里。详细步骤见项目里的 <strong>部署说明.md</strong>。</p>
+  </div>`;
+}
+
+function renderLogin() {
+  $('app').dataset.shell = '';
+  $('app').innerHTML = `<div class="gate">
+    <span class="sym-logo gate-logo" role="img" aria-label="SYM"></span>
+    <h1>繁星团契管理系统</h1>
+    <p id="loginHint">输入共用密码就能进入。登录一次后这台设备会一直记住。</p>
+    <form id="loginForm">
+      <label for="email" id="emailLabel" hidden>账号</label>
+      <input id="email" type="text" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="比如 liming" value="${esc(SHARED_ACCOUNT)}" hidden>
+      <label for="pw">密码</label>
+      <input id="pw" type="password" autocomplete="current-password" required>
+      <button type="submit" id="loginBtn">登录</button>
+      <div class="gate-error" id="loginErr"></div>
+    </form>
+    <button type="button" class="gate-link" id="useEmail">小组长：用自己的账号登录</button>
+    ${canSuggestInstall() ? '<button type="button" class="install-link" id="installHelp">📲 加到手机主屏幕，像 App 一样用</button>' : ''}
+  </div>`;
+  if ($('installHelp')) $('installHelp').addEventListener('click', openInstallHelp);
+
+  // 平时只要输共用密码；以前建的个人账号（邮箱 + 密码）也还能用
+  let personal = false;
+  $('useEmail').addEventListener('click', () => {
+    personal = !personal;
+    $('email').hidden = $('emailLabel').hidden = !personal;
+    $('email').value = personal ? '' : SHARED_ACCOUNT;
+    $('email').required = personal;
+    $('useEmail').textContent = personal ? '用共用密码登录' : '小组长：用自己的账号登录';
+    $('loginHint').textContent = personal ? '用管理员给你建的账号登录（账号写 liming 这样就行，也可以写完整的邮箱）。改了什么，「记录」里会写上你的名字。' : '输入共用密码就能进入。登录一次后这台设备会一直记住。';
+    $('loginErr').textContent = '';
+    (personal ? $('email') : $('pw')).focus();
+  });
+
+  $('loginForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = $('loginBtn'), err = $('loginErr');
+    btn.disabled = true; btn.textContent = '登录中…'; err.textContent = '';
+    // 小组长的账号只写「liming」也行：后面自动补上和共用账号一样的 @…（建账号时按部署说明建成 liming@…）
+    const raw = $('email').value.trim().toLowerCase();
+    const email = !personal ? SHARED_ACCOUNT : raw.includes('@') ? raw : `${raw}@${SHARED_ACCOUNT.split('@')[1] || 'star-mealcard.pages.dev'}`;
+    let res;
+    try {
+      res = await sb.auth.signInWithPassword({ email, password: $('pw').value });
+    } catch (x) { res = { error: x }; }
+    const { data, error } = res;
+    if (error) {
+      btn.disabled = false; btn.textContent = '登录';
+      const msg = error.message || '';
+      if (/Invalid login/i.test(msg) || error.code === 'invalid_credentials') {
+        err.innerHTML = personal ? '账号或密码不对，请再试一次'
+          : `密码不对，请再试一次<br><span class="gate-small">（管理员：第一次用的话，先在 Supabase 里建好共用账号 ${esc(SHARED_ACCOUNT)}，见部署说明）</span>`;
+      } else if (error.status === 429 || error.code === 'over_request_rate_limit') {
+        err.textContent = '尝试次数太多了，请过几分钟再试';
+      } else if (/invalid path|not found|404/i.test(msg)) {
+        // 这种不是密码问题：请求根本没到验证那一步
+        err.innerHTML = 'config.js 里的 SUPABASE_URL 填错了。<br>正确格式是 https://xxxxx.supabase.co，<br>.co 后面不能有 /rest/v1 之类的路径。';
+      } else if (isNetErr(error)) {
+        err.textContent = '连不上数据库，请检查网络，或确认 Supabase 项目没有被暂停';
+      } else if (error.status >= 500) {
+        err.textContent = `数据库暂时连不上（${error.status}）。如果一直这样，去 Supabase 后台看看项目是不是被暂停了（点 Restore）`;
+      } else {
+        err.textContent = '登录失败：' + msg;
+      }
+      return;
+    }
+    state.user = data.user;
+    await startApp();
+  });
+}
+
+function renderGateWithActions(title, paras, { retry = true, extraHtml = '' } = {}) {
+  $('app').dataset.shell = '';
+  $('app').innerHTML = `<div class="gate">
+    <span class="sym-logo gate-logo" role="img" aria-label="SYM"></span>
+    <h1>${esc(title)}</h1>
+    ${paras.map(p => `<p>${p}</p>`).join('')}
+    ${extraHtml}
+    <div class="gate-actions">
+      ${retry ? '<button type="button" class="gate-btn" id="gateRetry">重试</button>' : ''}
+      <button type="button" class="gate-btn ghost" id="gateLogout">退出登录</button>
+    </div>
+  </div>`;
+  $('gateRetry')?.addEventListener('click', () => startApp());
+  $('gateLogout').addEventListener('click', async () => { try { await sb.auth.signOut(); } catch {} location.reload(); });
+}
+
+async function startApp() {
+  $('app').dataset.shell = '';
+  $('app').innerHTML = `<div class="loading-screen"><div class="spinner"></div><div>正在加载数据…</div></div>`;
+  try {
+    // 先确认数据库已经升级到这一版需要的规则（版本不对就停下来说明，而不是半对半错地运行）
+    const ver = await sb.rpc('mealcard_schema_version');
+    if (ver.error) {
+      if (ver.status === 0 || isNetErr(ver.error)) throw Object.assign(new Error(ver.error.message), { status: 0 });
+      // 只有「找不到这个函数」才说明数据库还没升级；别的错误（密钥不对、项目暂停等）照实报
+      if (ver.status === 404 || ver.error.code === 'PGRST202' || /Could not find the function/i.test(ver.error.message || '')) return renderUpgradeNeeded();
+      throw Object.assign(new Error(ver.error.message || '未知错误'), { code: ver.error.code, status: ver.status });
+    }
+    if ((ver.data ?? 0) < 8) return renderUpgradeNeeded();
+    setSnapshot(await loadAll());
+    lastFullLoad = Date.now();
+  } catch (e) {
+    console.error(e);
+    renderGateWithActions('读取数据失败', [
+      esc(isNetErr(e) ? '网络不通，或者 Supabase 项目暂时连不上。'
+        : e?.status >= 500 ? `Supabase 服务器暂时出错（${e.status}），一般过一会儿就好。`
+        : (e?.message || '未知错误')),
+      '网络恢复后点「重试」就行。如果一直不行，看看 Supabase 项目是不是因为太久没用被暂停了（后台点一下 Restore 即可）。'
+    ]);
+    return;
+  }
+  render();
+  subscribeRealtime();
+  checkSignupDisabled();
+  askMyName();                       // 小组长第一次用自己的账号：问名字（「记录」里显示）
+}
+
+/* 安全自检：Supabase 默认允许任何人自己注册账号，而本系统里「登录的人」都能看、能改全部记录。
+   注册没关的话，陌生人注册一个账号就能进来。发现没关就提醒管理员（关掉后不再提醒）。 */
+let signupChecked = false;
+async function checkSignupDisabled() {
+  if (signupChecked) return;
+  signupChecked = true;
+  try {
+    const r = await fetchWithTimeout(`${SB_URL}/auth/v1/settings`, { headers: { apikey: SB_KEY } });
+    if (!r.ok) return;
+    const s = await r.json();
+    if (s && s.disable_signup === false && state.user) {
+      showModal({
+        title: '⚠️ 安全提醒：还允许任何人注册',
+        bodyHtml: `你的 Supabase 项目还开着「允许新用户注册」。在这个系统里，登录的人都能看、能改全部记录，所以<strong>陌生人自己注册一个账号就能进来</strong>。<br><br>请到 Supabase 后台 → <strong>Authentication</strong> → <strong>Sign In / Providers</strong>，把 <strong>Allow new users to sign up</strong> 关掉 → <strong>Save</strong>。关掉以后这个提醒就不会再出现。`,
+        buttons: [{ label: '知道了', variant: 'btn-primary', onClick: close => close() }]
+      });
+    }
+  } catch {}
+}
+
+function renderUpgradeNeeded() {
+  renderGateWithActions('数据库需要升级一次', [
+    '这一版网页需要数据库里的新东西（修改记录、补签和修改签到时间、签到表、支出登记、几台手机同时操作时的规则等）。',
+    '请在 Supabase 后台 → <strong>SQL Editor</strong> → New query，把 <strong>migration.sql</strong> 的全部内容粘贴进去点 Run，最后一行显示 <strong>8</strong> 就完成了。',
+    '升级完回到这里点「重试」。'
+  ]);
+}
+
+/* ============================================================
+   启动
+   ============================================================ */
+/* Supabase 后台上有好几个看起来都像网址的东西，很容易复制到带路径的那种。
+   这里把常见的几种写法都自动修正成正确的项目地址。 */
+function cleanSupabaseUrl(raw) {
+  let s = String(raw || '').trim().replace(/^["']|["']$/g, '');
+  if (!s) return '';
+  if (!/^https?:\/\//i.test(s)) s = 'https://' + s;
+  try {
+    const u = new URL(s);
+    return u.protocol + '//' + u.host;   // 丢掉 /rest/v1、结尾斜杠、查询参数等
+  } catch {
+    return s.replace(/\/+$/, '');
+  }
+}
+
+/* 每个请求最多等 15 秒：信号差时不会一直卡住，而是报错、回滚、提示 */
+function fetchWithTimeout(input, init = {}) {
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), 15000);
+  if (init.signal) init.signal.addEventListener('abort', () => ctl.abort(), { once: true });
+  return fetch(input, { ...init, signal: ctl.signal }).finally(() => clearTimeout(timer));
+}
+
+(async function boot() {
+  const cfg = window.MEALCARD_CONFIG || {};
+  const url = cleanSupabaseUrl(cfg.SUPABASE_URL);
+  const key = String(cfg.SUPABASE_ANON_KEY || '').trim();
+  if (!url || !key) { renderSetupNeeded(); return; }
+  window.__MEALCARD_RESOLVED_URL = url;   // 排查问题时可在控制台查看
+  SB_URL = url; SB_KEY = key;
+  SHARED_ACCOUNT = String(cfg.SHARED_ACCOUNT || SHARED_ACCOUNT_DEFAULT).trim().toLowerCase();
+
+  // 别的网站把这个页面套在自己页面里（iframe）诱导点击：直接不显示
+  if (window.top !== window.self) {
+    $('app').innerHTML = `<div class="gate"><h1>请直接打开网址</h1><p>为了安全，这个页面不能被嵌在别的网页里使用。</p></div>`;
+    return;
+  }
+
+  sb = createClient(url, key, {
+    auth: { persistSession: true, autoRefreshToken: true },
+    global: { fetch: fetchWithTimeout }
+  });
+
+  /* 登录失效了（比如在 Supabase 后台被强制退出、登录凭证作废）：
+     这时数据库什么都不会给，再刷新就会显示一张「空名单」，看起来像数据全丢了。
+     所以一旦发现被退出，马上回到登录页，并说清楚数据还在。 */
+  sb.auth.onAuthStateChange(event => {
+    if (event !== 'SIGNED_OUT' || !state.user) return;
+    state.user = null;
+    if (channel) { try { sb.removeChannel(channel); } catch {} channel = null; }
+    state.realtimeOk = false;
+    modalStack.slice().forEach(m => m.close());
+    renderLogin();
+    const err = $('loginErr');
+    if (err) err.textContent = '登录已失效，请重新登录（数据都还在，不会丢）';
+  });
+
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    state.user = session.user;
+    await startApp();
+  } else {
+    renderLogin();
+  }
+})();
+</script>
+</body>
+</html>

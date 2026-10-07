@@ -1,0 +1,32 @@
+{
+  "name": "繁星团契管理系统",
+  "short_name": "繁星团契管理系统",
+  "description": "繁星团契：签到、打饭、名册和账目",
+  "lang": "zh-CN",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FBF6EC",
+  "theme_color": "#FBF6EC",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

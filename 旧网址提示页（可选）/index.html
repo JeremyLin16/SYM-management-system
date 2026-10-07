@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>网址换了 · 繁星团契管理系统</title>
+<meta name="theme-color" content="#FBF6EC">
+<style>
+  :root { --paper: #FBF6EC; --card: #FFFFFF; --ink: #2B2620; --soft: #6B6257; --pine: #2F5141; --line: #E8DFCF; }
+  @media (prefers-color-scheme: dark) { :root { --paper: #1E1B16; --card: #29251F; --ink: #F1EADF; --soft: #B5AB9C; --pine: #8FC0A6; --line: #3A342B; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; background: var(--paper); color: var(--ink);
+         font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Segoe UI', sans-serif;
+         display: flex; align-items: center; justify-content: center;
+         padding: calc(24px + env(safe-area-inset-top, 0px)) 16px calc(24px + env(safe-area-inset-bottom, 0px)); }
+  main { width: 100%; max-width: 420px; text-align: center; }
+  .logo { width: 72px; height: 72px; border-radius: 22%; background: #fff url(data:image/png;base64,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) center / contain no-repeat; margin: 0 auto 18px; }
+  h1 { font-size: 22px; margin: 0 0 8px; }
+  p { margin: 0 0 18px; color: var(--soft); line-height: 1.6; }
+  .go { display: block; background: var(--pine); color: #fff; text-decoration: none; font-weight: 700; font-size: 17px;
+        padding: 15px 16px; border-radius: 14px; margin-bottom: 22px; word-break: break-all; }
+  @media (prefers-color-scheme: dark) { .go { color: #1E1B16; } }
+  ol { text-align: left; background: var(--card); border: 1px solid var(--line); border-radius: 14px; margin: 0; padding: 14px 16px 14px 36px; line-height: 1.7; font-size: 15px; }
+  li + li { margin-top: 6px; }
+  b { color: var(--ink); }
+</style>
+</head>
+<body>
+<main>
+  <div class="logo" role="img" aria-label="SYM"></div>
+  <h1>网址换了</h1>
+  <p>繁星团契管理系统现在的网址是</p>
+  <a class="go" href="https://star-youth-ministry.pages.dev/">star-youth-ministry.pages.dev</a>
+  <ol>
+    <li>删掉主屏幕上这个旧图标（「团契餐卡」）</li>
+    <li>用 <b>Safari</b>（iPhone）或 <b>Chrome</b>（安卓）打开 <b>star-youth-ministry.pages.dev</b>，登录一次</li>
+    <li>加到主屏幕：iPhone 点「分享」→「添加到主屏幕」；安卓点右上角「⋮」→「安装应用」</li>
+  </ol>
+</main>
+</body>
+</html>
